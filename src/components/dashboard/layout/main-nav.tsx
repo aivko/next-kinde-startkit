@@ -7,7 +7,7 @@ import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
-
+import { usePathname } from 'next/navigation';
 const { List: ListIcon } = require('@phosphor-icons/react/dist/ssr/List');
 const { Users: UsersIcon } = require('@phosphor-icons/react/dist/ssr/Users');
 const { Bell: BellIcon } = require('@phosphor-icons/react/dist/ssr/Bell');
@@ -19,13 +19,17 @@ const { Bell: BellIcon } = require('@phosphor-icons/react/dist/ssr/Bell');
 
 import { usePopover } from '@/hooks/use-popover';
 
-// import { MobileNav } from './mobile-nav';
+import { MobileNav } from './mobile-nav';
 import { UserPopover } from './user-popover';
 
 export function MainNav({ user }: any): React.JSX.Element {
   const [openNav, setOpenNav] = React.useState<boolean>(false);
-
+  const pathname = usePathname();
   const userPopover = usePopover<HTMLDivElement>();
+
+    React.useEffect(() => {
+        setOpenNav(false);
+    }, [pathname]);
 
   return (
     <>
@@ -53,11 +57,6 @@ export function MainNav({ user }: any): React.JSX.Element {
             >
               <ListIcon />
             </IconButton>
-            {/*<Tooltip title="Search">*/}
-            {/*  <IconButton>*/}
-            {/*    <MagnifyingGlassIcon />*/}
-            {/*  </IconButton>*/}
-            {/*</Tooltip>*/}
           </Stack>
           <Stack sx={{ alignItems: 'center' }} direction="row" spacing={2}>
             <Tooltip title="Contacts">
@@ -82,12 +81,12 @@ export function MainNav({ user }: any): React.JSX.Element {
         </Stack>
       </Box>
       <UserPopover user={user} anchorEl={userPopover.anchorRef.current} onClose={userPopover.handleClose} open={userPopover.open} />
-      {/*<MobileNav*/}
-      {/*  onClose={() => {*/}
-      {/*    setOpenNav(false);*/}
-      {/*  }}*/}
-      {/*  open={openNav}*/}
-      {/*/>*/}
+      <MobileNav
+        onClose={() => {
+          setOpenNav(false);
+        }}
+        open={openNav}
+      />
     </>
   );
 }
