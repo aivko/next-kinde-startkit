@@ -9,6 +9,7 @@ import {
   LogoutLink,
 } from "@kinde-oss/kinde-auth-nextjs/components";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
+import {PrismaClient} from "@prisma/client";
 import Link from "next/link";
 import { MainNav } from "@/components/dashboard/layout/main-nav";
 import { SideNav } from '@/components/dashboard/layout/side-nav';
@@ -17,6 +18,8 @@ import { SideNav } from '@/components/dashboard/layout/side-nav';
 //   title: "Kinde Auth",
 //   description: "Kinde with NextJS App Router",
 // };
+
+const prisma = new PrismaClient();
 
 export default async function RootLayout({
  children,
@@ -28,6 +31,26 @@ export default async function RootLayout({
   console.log(permissions);
   const user = await getUser();
   console.log(user);
+
+  if (!user || user === null || !user.id)
+    throw new Error("something went wrong with authentication" + user);
+
+  let dbUser = await prisma.admins.findUnique({
+    where: {kindeId: user.id}
+  });
+
+  if (!dbUser) {
+    dbUser = await prisma.admins.create({
+      data: {
+        kindeId: user.id,
+        firstName: user.given_name ?? "",
+        lastName: user.family_name ?? "",
+        email: user.email ?? "",
+        isVerified: false,
+        isVerifiedBySA: false,
+      }
+    });
+  }
 
   return (
     <>
