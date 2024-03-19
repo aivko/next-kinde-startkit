@@ -31,9 +31,9 @@ export default async function RootLayout({
   console.log(permissions);
   const user = await getUser();
   console.log(user);
-
-  if (!user || user === null || !user.id)
-    throw new Error("something went wrong with authentication" + user);
+    // if (!user || user === null || !user.id)
+    //   throw new Error("something went wrong with authentication" + user);
+  //
 
   // let dbUser = await prisma.admins.findUnique({
   //   where: {kindeId: user.id}
