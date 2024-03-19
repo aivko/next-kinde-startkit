@@ -1,87 +1,192 @@
 'use client';
+import React, { useState, useEffect } from "react";
+import Button from "@mui/material/Button";
+import Card from "@mui/material/Card";
+import CardActions from "@mui/material/CardActions";
+import CardContent from "@mui/material/CardContent";
+import CardHeader from "@mui/material/CardHeader";
+import Divider from "@mui/material/Divider";
+import FormControl from "@mui/material/FormControl";
+import Grid from "@mui/material/Unstable_Grid2";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
+import TextField from "@mui/material/TextField";
+import {
+  fetchAdmin,
+  createAdmin,
+  updateAdmin,
+} from "@/components/dashboard/account/api";
+import { phoneRegExp } from "@/components/dashboard/account/constants";
+import { AccountInfo } from '@/components/dashboard/account/account-info';
 
-import * as React from 'react';
-import Button from '@mui/material/Button';
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import CardHeader from '@mui/material/CardHeader';
-import Divider from '@mui/material/Divider';
-import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import Select from '@mui/material/Select';
-import Grid from '@mui/material/Unstable_Grid2';
-
-const states = [
-  { value: 'alabama', label: 'Alabama' },
-  { value: 'new-york', label: 'New York' },
-  { value: 'san-francisco', label: 'San Francisco' },
-  { value: 'los-angeles', label: 'Los Angeles' },
-] as const;
+interface FormData {
+  firstName: string;
+  lastName: string;
+  companyName: string;
+  email: string;
+  phoneNumber: string;
+}
 
 export function AccountDetailsForm(): React.JSX.Element {
+  const [adminInfo, setAdminInfo] = useState<FormData | null>(null);
+  const [isVerified, setVerified] = useState<boolean>(false);
+  const [isFormEditing, setFormEditing] = useState<boolean>(false);
+
+  const validationSchema = Yup.object().shape({
+    firstName: Yup.string().required('First name is required'),
+    lastName: Yup.string().required('Last name is required'),
+    companyName: Yup.string().required('Company name is required'),
+    email: Yup.string().email().required('Email is required'),
+    phoneNumber: Yup.string().matches(phoneRegExp, 'Phone number is not valid').required('Phone number is required')
+  });
+
+  const { register, handleSubmit, formState: { errors }, setValue } = useForm<FormData>({
+    resolver: yupResolver(validationSchema)
+  });
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const handleFormEditing = (val:boolean = true) => {
+    setFormEditing(val)
+  };
+
+  const fetchData = async () => {
+    try {
+      const res = await fetchAdmin();
+      const { firstName, lastName, companyName, email, phoneNumber } = res;
+      setValue('firstName', firstName);
+      setValue('lastName', lastName);
+      setValue('companyName', companyName);
+      setValue('email', email);
+      setValue('phoneNumber', phoneNumber);
+      setVerified(true);
+      setAdminInfo(res);
+    } catch (error) {
+      console.error('Error fetching profile data:', error);
+    }
+  };
+
+  const onSubmit = async (data: FormData) => {
+    if (isVerified) {
+      await updateAdmin({ data: data })
+        .then(res => {
+          setAdminInfo(res)
+          handleFormEditing(false);
+      });
+    } else {
+      await createAdmin(data);
+      const resultVerified = await updateAdmin({
+        data: {
+          isVerified: true
+        }
+      });
+      setVerified(resultVerified.isVerified);
+    }
+  }
+
   return (
-    <form
-      onSubmit={(event) => {
-        event.preventDefault();
-      }}
-    >
-      <Card>
-        <CardHeader subheader="The information can be edited" title="Profile" />
-        <Divider />
-        <CardContent>
-          <Grid container spacing={3}>
-            <Grid md={6} xs={12}>
-              <FormControl fullWidth required>
-                <InputLabel>First name</InputLabel>
-                <OutlinedInput defaultValue="Sofia" label="First name" name="firstName" />
-              </FormControl>
-            </Grid>
-            <Grid md={6} xs={12}>
-              <FormControl fullWidth required>
-                <InputLabel>Last name</InputLabel>
-                <OutlinedInput defaultValue="Rivers" label="Last name" name="lastName" />
-              </FormControl>
-            </Grid>
-            <Grid md={6} xs={12}>
-              <FormControl fullWidth required>
-                <InputLabel>Email address</InputLabel>
-                <OutlinedInput defaultValue="sofia@devias.io" label="Email address" name="email" />
-              </FormControl>
-            </Grid>
-            <Grid md={6} xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>Phone number</InputLabel>
-                <OutlinedInput label="Phone number" name="phone" type="tel" />
-              </FormControl>
-            </Grid>
-            <Grid md={6} xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>State</InputLabel>
-                <Select defaultValue="new-york" label="State" name="state" variant="outlined">
-                  {states.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid md={6} xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>City</InputLabel>
-                <OutlinedInput label="City" />
-              </FormControl>
-            </Grid>
-          </Grid>
-        </CardContent>
-        <Divider />
-        <CardActions sx={{ justifyContent: 'flex-end' }}>
-          <Button variant="contained">Save details</Button>
-        </CardActions>
-      </Card>
-    </form>
+    <>
+      {
+        !isFormEditing && isVerified && <AccountInfo
+          adminInfo={adminInfo}
+          handleFormEditing={handleFormEditing}
+        />
+      }
+      {
+        isFormEditing && <form onSubmit={handleSubmit(onSubmit)}>
+          <Card>
+            <CardHeader
+              subheader="The information can be edited"
+              title="Profile"
+            />
+            <Divider />
+            <CardContent>
+              <Grid container spacing={3}>
+                <Grid md={6} xs={12}>
+                  <FormControl fullWidth>
+                    <TextField
+                      error={Boolean(errors.firstName)}
+                      id="outlined-error-helper-text"
+                      label="First name*"
+                      helperText={errors?.firstName?.message}
+                      variant="outlined"
+                      {...register('firstName')}
+                      InputLabelProps={{ shrink: true }}
+                    />
+                  </FormControl>
+                </Grid>
+                <Grid md={6} xs={12}>
+                  <FormControl fullWidth required>
+                    <TextField
+                      error={Boolean(errors.lastName)}
+                      id="outlined-error-helper-text"
+                      label="Last name*"
+                      helperText={errors?.lastName?.message}
+                      variant="outlined"
+                      {...register('lastName')}
+                      InputLabelProps={{ shrink: true }}
+                    />
+                  </FormControl>
+                </Grid>
+                <Grid md={6} xs={12}>
+                  <FormControl fullWidth required>
+                    <TextField
+                      error={Boolean(errors.email)}
+                      id="outlined-error-helper-text"
+                      label="Email*"
+                      helperText={errors?.email?.message}
+                      variant="outlined"
+                      {...register('email')}
+                      InputLabelProps={{ shrink: true }}
+                    />
+                  </FormControl>
+                </Grid>
+                <Grid md={6} xs={12}>
+                  <FormControl fullWidth required>
+                    <TextField
+                      error={Boolean(errors.phoneNumber)}
+                      id="outlined-error-helper-text"
+                      label="Phone number*"
+                      helperText={errors?.phoneNumber?.message}
+                      variant="outlined"
+                      {...register('phoneNumber')}
+                      InputLabelProps={{ shrink: true }}
+                    />
+                  </FormControl>
+                </Grid>
+                <Grid md={6} xs={12}>
+                  <FormControl fullWidth required>
+                    <TextField
+                      error={Boolean(errors.companyName)}
+                      id="outlined-error-helper-text"
+                      label="Company Name*"
+                      helperText={errors?.companyName?.message}
+                      variant="outlined"
+                      {...register('companyName')}
+                      InputLabelProps={{ shrink: true }}
+                    />
+                  </FormControl>
+                </Grid>
+              </Grid>
+            </CardContent>
+            <Divider />
+            <CardActions sx={{ justifyContent: 'space-between', p: 3 }}>
+              <Button
+                onClick={() => handleFormEditing(false)}
+                size="medium"
+                type="submit"
+                variant="contained"
+              >
+                Cancel
+              </Button>
+              <Button size="medium" type="submit" variant="contained">Save</Button>
+            </CardActions>
+          </Card>
+        </form>
+      }
+    </>
   );
 }

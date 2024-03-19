@@ -14,20 +14,12 @@ datasource db {
 }
 
 model Admins {
-  id             String   @id @default(auto()) @map("_id") @db.ObjectId
-  kindeId        String   @unique
-  email          String   @unique
-  firstName      String
-  lastName       String
+  id             String   @id @map("_id")
+  email          String   @default("")
+  firstName      String   @default("")
+  lastName       String   @default("")
+  companyName    String   @default("")
+  phoneNumber    String   @default("")
   isVerified     Boolean  @default(false)
   isVerifiedBySA Boolean  @default(false)
-}
-
-model AdminInfo {
-  id             String   @id @default(auto()) @map("_id") @db.ObjectId
-  kindeId        String   @unique
-  email          String   @unique
-  firstName      String
-  lastName       String
-  companyName    String
 }
