@@ -44,10 +44,25 @@ export function AccountDetailsForm(): React.JSX.Element {
   const fetchData = async () => {
     try {
       const res = await fetchAdmin();
-      delete res.data.id;
-      for (const prop in res.data) {
-        setValue(prop, res.data[prop]);
-      }
+
+      setValue('adminEmail', res.data.adminEmail);
+      setValue('vat', res.data.vat);
+      setValue('iban', res.data.iban);
+      setValue('firstName', res.data.firstName);
+      setValue('companyName', res.data.companyName);
+      setValue('operationAddress', res.data.operationAddress);
+      setValue('operationPostCode', res.data.operationPostCode);
+      setValue('operationProvince', res.data.operationProvince);
+      setValue('operationCity', res.data.operationCity);
+      setValue('officeAddress', res.data.officeAddress);
+      setValue('officePostCode', res.data.officePostCode);
+      setValue('officeCity', res.data.officeCity);
+      setValue('officeProvince', res.data.officeProvince);
+      setValue('website', res.data.website);
+      setValue('phoneNumber', res.data.phoneNumber);
+      setValue('mobileNumber', res.data.mobileNumber);
+      setValue('notes', res.data.notes);
+
       setVerified(true);
       setAdminInfo(res.data);
     } catch (error) {
@@ -68,6 +83,8 @@ export function AccountDetailsForm(): React.JSX.Element {
           isVerified: true
         }
       });
+
+      console.log(resultVerified)
       setVerified(resultVerified.isVerified);
     }
   }
