@@ -5,6 +5,7 @@ const prisma = new PrismaClient();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   let parsedCookies: any;
+
   try {
     const cookies = req.cookies['user'];
     if (cookies != null) {
@@ -49,7 +50,7 @@ async function createAdminDb(payload: AdminProfileData, parsedCookies: any) {
   try {
     return await prisma.admins.create({
       data: {
-        id: parsedCookies.id || '',
+        id: parsedCookies?.id || '',
         firstName,
         lastName,
         email,
@@ -66,7 +67,7 @@ async function updateAdminDb(payload: { data: object }, parsedCookies: any) {
   const { data } = payload;
   try {
     return await prisma.admins.update({
-      where: { id: parsedCookies.id || '' },
+      where: { id: parsedCookies?.id || '' },
       data
     });
   } catch (error) {
@@ -77,7 +78,7 @@ async function updateAdminDb(payload: { data: object }, parsedCookies: any) {
 async function fetchAdminDb(payload: any, parsedCookies: any) {
   try {
     return await prisma.admins.findUniqueOrThrow({
-      where: { id: parsedCookies.id || '' },
+      where: { id: parsedCookies?.id || '' },
     });
   } catch (error) {
     throw error;

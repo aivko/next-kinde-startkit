@@ -3,7 +3,7 @@ import './../globals.css'
 import Box from '@mui/material/Box';
 import GlobalStyles from '@mui/material/GlobalStyles';
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import {PrismaClient} from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { redirect } from 'next/navigation';
 import { MainNav } from "@/components/dashboard/layout/main-nav";
 import { SideNav } from '@/components/dashboard/layout/side-nav';
@@ -12,7 +12,7 @@ const prisma = new PrismaClient();
 
 async function getAdminById(id: string) {
   try {
-    return await prisma.admins.findUniqueOrThrow({
+    return await prisma.admins.findUnique({
       where: { id: id }
     });
   } catch (error) {
@@ -25,8 +25,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { isAuthenticated, getUser, getPermission } = getKindeServerSession();
-  const permissions = await getPermission('x');
+  const { getUser } = getKindeServerSession();
   const user = await getUser();
 
   if (user && user?.id) {

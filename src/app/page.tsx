@@ -1,5 +1,13 @@
 import { redirect } from 'next/navigation';
+import {getKindeServerSession} from "@kinde-oss/kinde-auth-nextjs/server";
 
-export default function Page(): never {
+export default async function Page(): never {
+  const { getUser } = getKindeServerSession();
+  const user = await getUser();
+
+  if (!user) {
+      redirect('/api/auth/login?post_login_redirect_url=/dashboard/account');
+  }
+
   redirect('/dashboard');
 }
