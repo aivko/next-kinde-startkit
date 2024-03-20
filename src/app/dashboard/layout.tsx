@@ -1,20 +1,20 @@
 import * as React from "react";
-import './../globals.css'
-import Box from '@mui/material/Box';
-import GlobalStyles from '@mui/material/GlobalStyles';
+import "./../globals.css";
+import Box from "@mui/material/Box";
+import GlobalStyles from "@mui/material/GlobalStyles";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import {PrismaClient} from "@prisma/client";
-import { redirect } from 'next/navigation';
+import { PrismaClient } from "@prisma/client";
+import { redirect } from "next/navigation";
 import { MainNav } from "@/components/dashboard/layout/main-nav";
-import { SideNav } from '@/components/dashboard/layout/side-nav';
+import { SideNav } from "@/components/dashboard/layout/side-nav";
 
 const prisma = new PrismaClient();
 
 async function getAdminById(id: string) {
   try {
-    return await prisma.admins.findUniqueOrThrow({
-      where: { id: id }
-    });
+    return await prisma.admins.findUnique({
+      where: { id },
+    })
   } catch (error) {
     throw error;
   }

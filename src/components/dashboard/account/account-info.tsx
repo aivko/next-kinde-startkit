@@ -10,11 +10,23 @@ import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
 
 interface AdminInfo {
-  firstName: string;
-  lastName: string;
-  companyName: string;
   email: string;
+  vat: string;
+  iban: string;
+  firstName: string;
+  companyName: string;
+  operationAddress: string;
+  operationPostCode: string;
+  operationProvince: string;
+  operationCity: string;
+  officeAddress: string;
+  officePostCode: string;
+  officeCity: string;
+  officeProvince: string;
+  website: string;
   phoneNumber: string;
+  mobileNumber: string;
+  notes: string;
   isVerified: boolean;
 }
 
@@ -31,7 +43,7 @@ export const AccountInfo: FC<AccountInfoProps> = ({ adminInfo, handleFormEditing
           <CardContent>
             <Stack spacing={2} sx={{ alignItems: 'center' }}>
               <Stack spacing={1} sx={{ textAlign: 'center' }}>
-                <Typography variant="h5">{adminInfo.firstName} {adminInfo.lastName}</Typography>
+                <Typography variant="h5">{adminInfo.firstName}</Typography>
                 <Typography color="text.secondary" variant="body2">
                   {adminInfo.companyName}
                 </Typography>
