@@ -13,8 +13,8 @@ const prisma = new PrismaClient();
 async function getAdminById(id: string) {
   try {
     return await prisma.admins.findUnique({
-      where: { id },
-    })
+      where: { id: id }
+    });
   } catch (error) {
     throw error;
   }
@@ -25,8 +25,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { isAuthenticated, getUser, getPermission } = getKindeServerSession();
-  const permissions = await getPermission('x');
+  const { getUser } = getKindeServerSession();
   const user = await getUser();
 
   if (user && user?.id) {
