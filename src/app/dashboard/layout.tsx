@@ -1,58 +1,51 @@
 import * as React from "react";
-import './../globals.css'
-import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
-import GlobalStyles from '@mui/material/GlobalStyles';
-import {
-  RegisterLink,
-  LoginLink,
-  LogoutLink,
-} from "@kinde-oss/kinde-auth-nextjs/components";
+import "./../globals.css";
+import Box from "@mui/material/Box";
+import GlobalStyles from "@mui/material/GlobalStyles";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-// import {PrismaClient} from "@prisma/client";
-import Link from "next/link";
+import { PrismaClient } from "@prisma/client";
+import { redirect } from "next/navigation";
 import { MainNav } from "@/components/dashboard/layout/main-nav";
-import { SideNav } from '@/components/dashboard/layout/side-nav';
+import { SideNav } from "@/components/dashboard/layout/side-nav";
+// @ts-nocheck
+const prisma = new PrismaClient();
 
-// export const metadata = {
-//   title: "Kinde Auth",
-//   description: "Kinde with NextJS App Router",
-// };
-
-// const prisma = new PrismaClient();
+async function getAdminById(id: string) {
+  try {
+    return await prisma.admins.findUnique({
+      where: { id: id }
+    });
+  } catch (error) {
+    throw error;
+  }
+}
 
 export default async function RootLayout({
  children,
 }: {
   children: React.ReactNode;
 }) {
-  const { isAuthenticated, getUser, getPermission } = getKindeServerSession();
-  const permissions = await getPermission('x');
-  console.log(permissions);
+  const { getUser } = getKindeServerSession();
   const user = await getUser();
-  console.log(user);
-    // if (!user || user === null || !user.id)
-    //   throw new Error("something went wrong with authentication" + user);
-  //
 
-  // let dbUser = await prisma.admins.findUnique({
-  //   where: {kindeId: user.id}
-  // });
-  //
-  // if (!dbUser) {
-  //   dbUser = await prisma.admins.create({
-  //     data: {
-  //       kindeId: user.id,
-  //       firstName: user.given_name ?? "",
-  //       lastName: user.family_name ?? "",
-  //       email: user.email ?? "",
-  //       isVerified: false,
-  //       isVerifiedBySA: false,
-  //     }
-  //   });
-  // }
-  //
-  // console.log(dbUser);
+  if (user && user?.id) {
+    const { id, email = '' } = user;
+    const admin = await getAdminById(id);
+
+    console.log(admin);
+    if (!admin) {
+      await prisma.admins.create({
+        data: {
+          id,
+          email,
+          isVerified: false,
+          isVerifiedBySA: false,
+        }
+      });
+
+      redirect("/dashboard/account");
+    }
+  }
 
   return (
     <>
@@ -82,54 +75,9 @@ export default async function RootLayout({
           <MainNav user={user}/>
           <main>
             {children}
-            {/*<Container maxWidth="xl" sx={{ py: '64px' }}>*/}
-            {/*  <LoginLink className="btn btn-ghost sign-in-btn">*/}
-            {/*    Sign in*/}
-            {/*  </LoginLink>*/}
-            {/*  <RegisterLink className="btn btn-green">Sign up</RegisterLink>*/}
-            {/*</Container>*/}
           </main>
         </Box>
       </Box>
-    {/*  <nav className="nav container">*/}
-    {/*    <h1 className="text-display-3">Officine Futuro</h1>*/}
-    {/*    <div>*/}
-    {/*      {!(await isAuthenticated()) ? (*/}
-    {/*        <>*/}
-    {/*          <LoginLink className="btn btn-ghost sign-in-btn">*/}
-    {/*            Sign in*/}
-    {/*          </LoginLink>*/}
-    {/*          <RegisterLink className="btn btn-green">Sign up</RegisterLink>*/}
-    {/*        </>*/}
-    {/*      ) : (*/}
-    {/*        <MainNav user={user} />*/}
-    {/*        // <div className="profile-blob">*/}
-    {/*        //   {user?.picture ? (*/}
-    {/*        //     <img*/}
-    {/*        //       className="avatar"*/}
-    {/*        //       src={user?.picture}*/}
-    {/*        //       alt="user profile avatar"*/}
-    {/*        //       referrerPolicy="no-referrer"*/}
-    {/*        //     />*/}
-    {/*        // //   ) : (*/}
-    {/*        // //     <div className="avatar">*/}
-    {/*        //       /!*{user?.given_name?.[0]}*!/*/}
-    {/*        //       /!*{user?.family_name?.[0]}*!/*/}
-    {/*        // //     </div>*/}
-    {/*        // //   )}*/}
-    {/*        //   <div>*/}
-    {/*        //     <p className="text-heading-2">*/}
-    {/*        //       {user?.given_name} {user?.family_name}*/}
-    {/*        //     </p>*/}
-    {/*        //*/}
-    {/*        //     <LogoutLink className="text-subtle">Log out</LogoutLink>*/}
-    {/*        //   </div>*/}
-    {/*        // </div>*/}
-    {/*      )}*/}
-    {/*    </div>*/}
-    {/*  </nav>*/}
-    {/*/!*<SideNav />*!/*/}
-    {/*<main>{children}</main>*/}
   </>
   );
 }

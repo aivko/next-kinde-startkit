@@ -1,13 +1,12 @@
 "use client";
 import * as React from 'react';
-//import type { Viewport } from 'next';
 
 import './globals.css';
 import { KindeProvider } from "@kinde-oss/kinde-auth-nextjs";
 // import { UserProvider } from '@/contexts/user-context';
 // import { LocalizationProvider } from '@/components/core/localization-provider';
 import { ThemeProvider } from '@/components/core/theme-provider/theme-provider';
-import { LoginLink, RegisterLink } from "@kinde-oss/kinde-auth-nextjs/components";
+//import { LoginLink, RegisterLink } from "@kinde-oss/kinde-auth-nextjs/components";
 // import { UserProvider } from '@/contexts/user-context';
 
 interface LayoutProps {
@@ -16,7 +15,7 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps): React.JSX.Element {
   return (
-    <>
+    <KindeProvider>
       <html lang="en">
         <body>
         <>
@@ -26,6 +25,6 @@ export default function Layout({ children }: LayoutProps): React.JSX.Element {
         </>
         </body>
       </html>
-    </>
+    </KindeProvider>
   );
 }

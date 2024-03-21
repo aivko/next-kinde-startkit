@@ -14,20 +14,25 @@ datasource db {
 }
 
 model Admins {
-  id             String   @id @default(auto()) @map("_id") @db.ObjectId
-  kindeId        String   @unique
-  email          String   @unique
-  firstName      String
-  lastName       String
-  isVerified     Boolean  @default(false)
-  isVerifiedBySA Boolean  @default(false)
-}
-
-model AdminInfo {
-  id             String   @id @default(auto()) @map("_id") @db.ObjectId
-  kindeId        String   @unique
-  email          String   @unique
-  firstName      String
-  lastName       String
-  companyName    String
+  id                  String   @id @map("_id")
+  email               String   @default("")
+  adminEmail          String   @default("")
+  vat                 String   @default("")
+  iban                String   @default("")
+  firstName           String   @default("")
+  companyName         String   @default("")
+  operationAddress    String   @default("")
+  operationPostCode   String   @default("")
+  operationProvince   String   @default("")
+  operationCity       String   @default("")
+  officeAddress       String   @default("")
+  officePostCode      String   @default("")
+  officeCity          String   @default("")
+  officeProvince      String   @default("")
+  website             String   @default("")
+  phoneNumber         String   @default("")
+  mobileNumber        String   @default("")
+  notes               String   @default("")
+  isVerified          Boolean  @default(false)
+  isVerifiedBySA      Boolean  @default(false)
 }
