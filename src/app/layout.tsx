@@ -6,7 +6,7 @@ import { KindeProvider } from "@kinde-oss/kinde-auth-nextjs";
 // import { UserProvider } from '@/contexts/user-context';
 // import { LocalizationProvider } from '@/components/core/localization-provider';
 import { ThemeProvider } from '@/components/core/theme-provider/theme-provider';
-import { LoginLink, RegisterLink } from "@kinde-oss/kinde-auth-nextjs/components";
+//import { LoginLink, RegisterLink } from "@kinde-oss/kinde-auth-nextjs/components";
 // import { UserProvider } from '@/contexts/user-context';
 
 interface LayoutProps {
