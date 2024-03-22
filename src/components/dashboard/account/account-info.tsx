@@ -53,7 +53,7 @@ export const AccountInfo: FC<AccountInfoProps> = ({ adminInfo, handleFormEditing
                 <Typography color="text.secondary" variant="body2">
                   {adminInfo.phoneNumber}
                 </Typography>
-                <Chip label={ adminInfo.isVerified ? 'verified' : 'not verified' } color={ adminInfo.isVerified ? 'success' : 'primary' } variant="outlined" />
+                <Chip label={ adminInfo.isVerified ? 'verificato' : 'non verificato' } color={ adminInfo.isVerified ? 'success' : 'primary' } variant="outlined" />
               </Stack>
             </Stack>
           </CardContent>
@@ -64,7 +64,7 @@ export const AccountInfo: FC<AccountInfoProps> = ({ adminInfo, handleFormEditing
               fullWidth
               variant="text"
             >
-              Edit User
+              Modifica agenzia
             </Button>
           </CardActions>
         </Card>

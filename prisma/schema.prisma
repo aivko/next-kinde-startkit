@@ -15,7 +15,7 @@ datasource db {
 
 model Admins {
   id                  String   @id @map("_id")
-  email               String   @default("")
+  email               String   @unique @default("")
   adminEmail          String   @default("")
   vat                 String   @default("")
   iban                String   @default("")
@@ -35,4 +35,29 @@ model Admins {
   notes               String   @default("")
   isVerified          Boolean  @default(false)
   isVerifiedBySA      Boolean  @default(false)
+}
+
+model Customer {
+  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+  agencyId            String   @default("")
+  email               String   @default("")
+  vat                 String   @default("")
+  iban                String   @default("")
+  firstName           String   @default("")
+  companyName         String   @default("")
+  operationAddress    String   @default("")
+  operationPostCode   String   @default("")
+  operationProvince   String   @default("")
+  operationCity       String   @default("")
+  officeAddress       String   @default("")
+  officePostCode      String   @default("")
+  officeCity          String   @default("")
+  officeProvince      String   @default("")
+  phoneNumber         String   @default("")
+  mobileNumber        String   @default("")
+  notes               String   @default("")
+  isActive            Boolean  @default(true)
+  electricitySelected Boolean  @default(false)
+  gasSelected         Boolean  @default(false)
+  fibreSelected       Boolean  @default(false)
 }

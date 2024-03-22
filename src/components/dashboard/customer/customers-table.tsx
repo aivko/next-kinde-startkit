@@ -1,26 +1,21 @@
 'use client';
 
-import * as React from 'react';
-import Avatar from '@mui/material/Avatar';
+import React, { useEffect, useState } from "react";
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
-import Checkbox from '@mui/material/Checkbox';
 import Divider from '@mui/material/Divider';
-import Stack from '@mui/material/Stack';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
-import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
-import dayjs from 'dayjs';
+import Switch from '@mui/material/Switch';
+import IconButton from '@mui/material/IconButton';
+import { PencilSimple as PencilSimpleIcon } from '@phosphor-icons/react/dist/ssr/PencilSimple';
+import { Trash as TrashIcon } from '@phosphor-icons/react/dist/ssr/Trash';
 
-import { useSelection } from '@/hooks/use-selection';
-
-function noop(): void {
-  // do nothing
-}
+import { fetchAllCustomer, removeCustomer } from "@/components/dashboard/customer/api";
 
 export interface Customer {
   id: string;
@@ -39,20 +34,43 @@ interface CustomersTableProps {
   rowsPerPage?: number;
 }
 
-export function CustomersTable({
-  count = 0,
-  rows = [],
-  page = 0,
-  rowsPerPage = 0,
-}: CustomersTableProps): React.JSX.Element {
-  const rowIds = React.useMemo(() => {
-    return rows.map((customer) => customer.id);
-  }, [rows]);
+export function CustomersTable({ customer }): React.JSX.Element {
+  const [customers, setCustomers] = useState([]);
 
-  const { selectAll, deselectAll, selectOne, deselectOne, selected } = useSelection(rowIds);
+  useEffect(() => {
+    fetchAllCustomer().then(res => {
+      setCustomers(res.data);
+    });
+  }, []);
 
-  const selectedSome = (selected?.size ?? 0) > 0 && (selected?.size ?? 0) < rows.length;
-  const selectedAll = rows.length > 0 && selected?.size === rows.length;
+  useEffect(() => {
+    setCustomers([customer, ...customers]);
+  }, [customer]);
+
+  const handleChange = (id:string) => {
+    const array = customers.map(customer => {
+      if (customer.id === id) {
+        return { ...customer, isActive: !customer.isActive };
+      }
+      return customer;
+    })
+
+    setCustomers(array)
+  };
+
+  const handleEdit = (id:string) => {
+    console.log(id)
+  };
+
+  const handleDelete = async (id:string) => {
+    try {
+      await removeCustomer(id);
+      const updatedCustomers = customers.filter(customer => customer.id !== id);
+      setCustomers(updatedCustomers);
+    } catch (error) {
+      console.error("Error occurred while deleting customer:", error);
+    }
+  };
 
   return (
     <Card>
@@ -60,72 +78,53 @@ export function CustomersTable({
         <Table sx={{ minWidth: '800px' }}>
           <TableHead>
             <TableRow>
-              <TableCell padding="checkbox">
-                <Checkbox
-                  checked={selectedAll}
-                  indeterminate={selectedSome}
-                  onChange={(event) => {
-                    if (event.target.checked) {
-                      selectAll();
-                    } else {
-                      deselectAll();
-                    }
-                  }}
-                />
-              </TableCell>
               <TableCell>Name</TableCell>
+              <TableCell>Company name</TableCell>
               <TableCell>Email</TableCell>
-              <TableCell>Location</TableCell>
               <TableCell>Phone</TableCell>
-              <TableCell>Signed Up</TableCell>
+              <TableCell>Status</TableCell>
+              <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row) => {
-              const isSelected = selected?.has(row.id);
+            {customers.map((row) =>
+              <TableRow hover key={row.id} >
+                <TableCell>
+                  <Typography variant="subtitle2">{row.firstName}</Typography>
+                </TableCell>
+                <TableCell>{row.companyName}</TableCell>
+                <TableCell>{row.email}</TableCell>
+                <TableCell>{row.phoneNumber}</TableCell>
+                <TableCell>
+                  <Switch
+                    checked={row.isActive}
+                    onChange={() => handleChange(row.id)}
+                    inputProps={{ 'aria-label': 'controlled' }}
+                  />
+                </TableCell>
+                <TableCell>
+                  <IconButton
+                    onClick={() => handleEdit(row.id)}
+                    aria-label="edit"
+                    size="small"
+                  >
+                    <PencilSimpleIcon />
+                  </IconButton>
 
-              return (
-                <TableRow hover key={row.id} selected={isSelected}>
-                  <TableCell padding="checkbox">
-                    <Checkbox
-                      checked={isSelected}
-                      onChange={(event) => {
-                        if (event.target.checked) {
-                          selectOne(row.id);
-                        } else {
-                          deselectOne(row.id);
-                        }
-                      }}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Stack sx={{ alignItems: 'center' }} direction="row" spacing={2}>
-                      <Avatar src={row.avatar} />
-                      <Typography variant="subtitle2">{row.name}</Typography>
-                    </Stack>
-                  </TableCell>
-                  <TableCell>{row.email}</TableCell>
-                  <TableCell>
-                    {row.address.city}, {row.address.state}, {row.address.country}
-                  </TableCell>
-                  <TableCell>{row.phone}</TableCell>
-                  <TableCell>{dayjs(row.createdAt).format('MMM D, YYYY')}</TableCell>
-                </TableRow>
-              );
-            })}
+                  <IconButton
+                    onClick={() => handleDelete(row.id)}
+                    aria-label="delte"
+                    size="small"
+                  >
+                    <TrashIcon />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </Box>
       <Divider />
-      <TablePagination
-        component="div"
-        count={count}
-        onPageChange={noop}
-        onRowsPerPageChange={noop}
-        page={page}
-        rowsPerPage={rowsPerPage}
-        rowsPerPageOptions={[5, 10, 25]}
-      />
     </Card>
   );
 }
