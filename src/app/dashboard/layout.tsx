@@ -7,7 +7,6 @@ import { PrismaClient } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { MainNav } from "@/components/dashboard/layout/main-nav";
 import { SideNav } from "@/components/dashboard/layout/side-nav";
-// @ts-nocheck
 const prisma = new PrismaClient();
 
 async function getAdminById(id: string) {
@@ -31,8 +30,6 @@ export default async function RootLayout({
   if (user && user?.id) {
     const { id, email = '' } = user;
     const admin = await getAdminById(id);
-
-    console.log(admin);
     if (!admin) {
       await prisma.admins.create({
         data: {
