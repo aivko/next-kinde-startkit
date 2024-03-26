@@ -22,10 +22,12 @@ export async function GET(req : NextRequest) {
   const user:any = await initKindeServerSession();
   const url = new URL(req.url);
   let data:any;
+
   if (url.search === "?all") {
     data = await getAllCustomerHandler({ id: user.id });
   } else {
-    data = await getCustomerHandler({ id: user.id, });
+    const customerId = url.search.replace(/^(\?id)/, '');
+    data = await getCustomerHandler({ id: user.id, customerId });
   }
 
   return NextResponse.json({ data });

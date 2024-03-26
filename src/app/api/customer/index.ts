@@ -1,12 +1,13 @@
 import { PrismaClient } from "@prisma/client";
+
 const prisma = new PrismaClient();
 
 export async function postCustomerHandler({ req }: { req: any }) {
   return await createCustomerDb(req);
 }
 
-export async function getCustomerHandler({ id }: { id: any }) {
-  return await fetchCustomerDb({ id });
+export async function getCustomerHandler({ id, customerId }: { id: any, customerId: any }) {
+  return await fetchCustomerDb({ id, customerId });
 }
 
 export async function getAllCustomerHandler({ id }: { id: any }) {
@@ -39,14 +40,14 @@ interface CustomerProfileData {
   phoneNumber: string;
   mobileNumber: string;
   notes: string;
+  isVerified: boolean;
+  isVerifiedBySA: boolean;
 }
 
 async function createCustomerDb(payload: CustomerProfileData) {
   try {
     return await prisma.customer.create({
-      data: {
-        ...payload
-      },
+      data: payload,
     });
   } catch (error) {
     throw error;
@@ -55,11 +56,15 @@ async function createCustomerDb(payload: CustomerProfileData) {
 
 async function updateCustomerDb(data: any, id: any) {
   try {
-    const res = await prisma.customer.update({
-      where: { id: id || '' },
-      data: data.data
+    const customerId = data.id;
+    delete data['id'];
+    return await prisma.customer.update({
+      where: {
+        agencyId: id,
+        id: customerId
+      },
+      data: data
     });
-    return res;
   } catch (error) {
     throw error;
   }
@@ -75,10 +80,13 @@ async function fetchAllCustomerDb({ id }: { id:string }) {
   }
 }
 
-async function fetchCustomerDb({ id }: { id:string }) {
+async function fetchCustomerDb({ id, customerId }: { id:string, customerId:string }) {
   try {
     return await prisma.customer.findUnique({
-      where: { id },
+      where: {
+        agencyId: id,
+        id: customerId
+      },
     });
   } catch (error) {
     throw error;

@@ -45,10 +45,10 @@ export const updateCustomer = async (payload: any) => {
   });
 };
 
-export const fetchCustomer = async () => {
+export const fetchCustomer = async (id: string) => {
   return sendRequest({
     method: "GET",
-    uri: "/api/customer"
+    uri: `/api/customer?id${id}`,
   });
 };
 

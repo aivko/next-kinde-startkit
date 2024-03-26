@@ -4,7 +4,6 @@ import * as React from 'react';
 import RouterLink from 'next/link';
 import { usePathname } from 'next/navigation';
 import Box from '@mui/material/Box';
-// import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
@@ -12,8 +11,6 @@ import Typography from '@mui/material/Typography';
 import type { NavItemConfig } from '@/types/nav';
 import { paths } from '@/paths';
 import { isNavItemActive } from '@/lib/is-nav-item-active';
-// import { Logo } from '@/components/core/logo';
-
 import { navItems } from './config';
 import { navIcons } from './nav-icons';
 
@@ -50,7 +47,6 @@ export function SideNav(): React.JSX.Element {
     >
       <Stack spacing={2} sx={{ p: 2 }}>
         <Box component={RouterLink} href={paths.home} sx={{ display: 'inline-flex' }}>
-          {/*<Logo color="light" height={32} width={32} />*/}
           <span className="text-display-3">Officine del futuro</span>
         </Box>
       </Stack>
@@ -60,7 +56,7 @@ export function SideNav(): React.JSX.Element {
       </Box>
       <Box sx={{ pb: '12px', textAlign: 'center' }}>
         <small className="text-subtle">
-          © 2024 Officine del futuro. All rights reserved
+          © {new Date().getFullYear()}. All rights reserved
         </small>
       </Box>
       <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />

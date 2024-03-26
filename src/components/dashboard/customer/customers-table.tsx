@@ -12,61 +12,53 @@ import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import Switch from '@mui/material/Switch';
 import IconButton from '@mui/material/IconButton';
-import { PencilSimple as PencilSimpleIcon } from '@phosphor-icons/react/dist/ssr/PencilSimple';
-import { Trash as TrashIcon } from '@phosphor-icons/react/dist/ssr/Trash';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
-import { fetchAllCustomer, removeCustomer } from "@/components/dashboard/customer/api";
+import { fetchAllCustomer, fetchCustomer, removeCustomer } from "@/components/dashboard/customer/api";
+import { CustomersForm } from "@/components/dashboard/customer/customers-form";
+import { useCustomerContext } from "@/components/dashboard/customer/customers-layout";
+import { CREATING, EDITING } from "@/components/dashboard/customer/constants";
 
-export interface Customer {
-  id: string;
-  avatar: string;
-  name: string;
-  email: string;
-  address: { city: string; state: string; country: string; street: string };
-  phone: string;
-  createdAt: Date;
-}
-
-interface CustomersTableProps {
-  count?: number;
-  page?: number;
-  rows?: Customer[];
-  rowsPerPage?: number;
-}
-
-export function CustomersTable({ customer }): React.JSX.Element {
-  const [customers, setCustomers] = useState([]);
+export function CustomersTable() {
+  const {
+    isModalOpenContext,
+    setModalOpenContext,
+    setCustomerContext,
+    setCustomersContext,
+    customersContext,
+  } = useCustomerContext();
 
   useEffect(() => {
     fetchAllCustomer().then(res => {
-      setCustomers(res.data);
+      // hack to show last added customers first
+      const customersList = res.data || [];
+      setCustomersContext(customersList.reverse());
     });
   }, []);
 
-  useEffect(() => {
-    setCustomers([customer, ...customers]);
-  }, [customer]);
-
-  const handleChange = (id:string) => {
-    const array = customers.map(customer => {
+  const handleChangeStatus = (id:string) => {
+    const array = customersContext.map(customer => {
       if (customer.id === id) {
-        return { ...customer, isActive: !customer.isActive };
+        return { ...custojiymer, isActive: !customer.isActive };
       }
       return customer;
     })
 
-    setCustomers(array)
+    setCustomersContext(array)
   };
 
-  const handleEdit = (id:string) => {
-    console.log(id)
+  const handleEdit = async (id: string) => {
+    const customer = await fetchCustomer(id);
+    setCustomerContext(customer.data);
+    setModalOpenContext(true);
   };
 
   const handleDelete = async (id:string) => {
     try {
       await removeCustomer(id);
-      const updatedCustomers = customers.filter(customer => customer.id !== id);
-      setCustomers(updatedCustomers);
+      const updatedCustomers = customersContext.filter(customer => customer.id !== id);
+      setCustomersContext(updatedCustomers);
     } catch (error) {
       console.error("Error occurred while deleting customer:", error);
     }
@@ -87,7 +79,7 @@ export function CustomersTable({ customer }): React.JSX.Element {
             </TableRow>
           </TableHead>
           <TableBody>
-            {customers.map((row) =>
+            {customersContext.map((row) =>
               <TableRow hover key={row.id} >
                 <TableCell>
                   <Typography variant="subtitle2">{row.firstName}</Typography>
@@ -98,7 +90,7 @@ export function CustomersTable({ customer }): React.JSX.Element {
                 <TableCell>
                   <Switch
                     checked={row.isActive}
-                    onChange={() => handleChange(row.id)}
+                    onChange={() => handleChangeStatus(row.id)}
                     inputProps={{ 'aria-label': 'controlled' }}
                   />
                 </TableCell>
@@ -108,7 +100,7 @@ export function CustomersTable({ customer }): React.JSX.Element {
                     aria-label="edit"
                     size="small"
                   >
-                    <PencilSimpleIcon />
+                    <EditIcon />
                   </IconButton>
 
                   <IconButton
@@ -116,7 +108,7 @@ export function CustomersTable({ customer }): React.JSX.Element {
                     aria-label="delte"
                     size="small"
                   >
-                    <TrashIcon />
+                    <DeleteForeverIcon />
                   </IconButton>
                 </TableCell>
               </TableRow>
@@ -125,6 +117,11 @@ export function CustomersTable({ customer }): React.JSX.Element {
         </Table>
       </Box>
       <Divider />
+      {
+        isModalOpenContext && <CustomersForm
+          mode={EDITING}
+        />
+      }
     </Card>
   );
 }

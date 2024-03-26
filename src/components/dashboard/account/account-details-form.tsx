@@ -25,8 +25,7 @@ import {
 import { AccountInfo } from '@/components/dashboard/account/account-info';
 
 export function AccountDetailsForm(): React.JSX.Element {
-  const [adminInfo, setAdminInfo] = useState<FormData | null>(null);
-  const [isVerified, setVerified] = useState<boolean>(false);
+  const [adminInfo, setAdminInfo] = useState<FormData | {}>({});
   const [isFormEditing, setFormEditing] = useState<boolean>(false);
 
   const { register, handleSubmit, formState: { errors }, setValue } = useForm<FormData>({
@@ -44,7 +43,6 @@ export function AccountDetailsForm(): React.JSX.Element {
   const fetchData = async () => {
     try {
       const res = await fetchAdmin();
-
       setValue('adminEmail', res.data.adminEmail);
       setValue('vat', res.data.vat);
       setValue('iban', res.data.iban);
@@ -62,37 +60,24 @@ export function AccountDetailsForm(): React.JSX.Element {
       setValue('phoneNumber', res.data.phoneNumber);
       setValue('mobileNumber', res.data.mobileNumber);
       setValue('notes', res.data.notes);
-
-      setVerified(true);
       setAdminInfo(res.data);
     } catch (error) {
       console.error('Error fetching profile data:', error);
     }
   };
   const onSubmit = async (data: FormData) => {
-    if (isVerified) {
-      await updateAdmin({ data: data })
-        .then(res => {
-          setAdminInfo(res.data)
-          handleFormEditing(false);
+    data['isVerified'] = true;
+    await updateAdmin({ data: data })
+      .then(res => {
+        setAdminInfo(res.data)
+        handleFormEditing(false);
       });
-    } else {
-      await createAdmin(data);
-      const resultVerified = await updateAdmin({
-        data: {
-          isVerified: true
-        }
-      });
-
-      console.log(resultVerified)
-      setVerified(resultVerified.isVerified);
-    }
   }
 
   return (
     <>
       {
-        !isFormEditing && isVerified && <AccountInfo
+        !isFormEditing && <AccountInfo
           adminInfo={adminInfo}
           handleFormEditing={handleFormEditing}
         />
