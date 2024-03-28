@@ -4,6 +4,10 @@ import Slide from "@mui/material/Slide";
 import * as Yup from "yup";
 import { phoneRegExp } from "@/components/dashboard/account/constants";
 
+export const mergeObjects = (mainObj, obj) => {
+  return { ...mainObj, ...obj };
+};
+
 export const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
     children: React.ReactElement;

@@ -12,26 +12,10 @@ export async function getHandler({ id }: { id: any }) {
 export async function patchHandler({ data, id }: { data: any, id: any }) {
   return await updateAdminDb(data, id);
 }
-
-interface AdminProfileData {
-  id: string;
-  firstName: string;
-  email: string;
-  companyName: string;
-  phoneNumber: string;
-}
-
-async function createAdminDb(payload: AdminProfileData, id: any) {
-  const { firstName, email, companyName, phoneNumber } = payload;
+async function createAdminDb(payload: any, id: any) {
   try {
     return await prisma.admins.create({
-      data: {
-        id: id,
-        firstName,
-        email,
-        companyName,
-        phoneNumber,
-      },
+      data: payload,
     });
   } catch (error) {
     throw error;
