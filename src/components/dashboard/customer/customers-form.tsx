@@ -15,7 +15,7 @@ import Divider from "@mui/material/Divider";
 import CardActions from "@mui/material/CardActions";
 import Button from "@mui/material/Button";
 import { useForm, Controller } from "react-hook-form";
-import { FormData, Transition, validationSchema, mergeObjects } from "@/components/dashboard/customer/helpers";
+import { FormData, Transition, validationSchema, mergeObjects, hiddenInputStyles, errorText } from "@/components/dashboard/customer/helpers";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { createCustomer, updateCustomer } from "@/components/dashboard/customer/api";
 import Dialog from "@mui/material/Dialog";
@@ -25,8 +25,17 @@ import IconButton from "@mui/material/IconButton";
 import CloseIcon from '@mui/icons-material/Close';
 import { useCustomerContext } from "@/components/dashboard/customer/customers-layout";
 import { CREATING, EDITING } from "@/components/dashboard/customer/constants";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import CircularProgress from "@mui/material/CircularProgress";
+import Chip from "@mui/material/Chip";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { deleteClientFiles, saveClientFiles } from "@/components/dashboard/api/dropBox";
 
 export function CustomersForm({ mode }) {
+  const [addedFiles, setAddedFiles] = useState<Array<any>>([]);
+  const [addedFilesError, setAddedFilesError] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+
   const { isModalOpenContext,
     setModalOpenContext,
     customerContext,
@@ -55,6 +64,7 @@ export function CustomersForm({ mode }) {
       setValue('operationProvince', customerContext.operationProvince);
       setValue('phoneNumber', customerContext.phoneNumber);
       setValue('vat', customerContext.vat);
+      setAddedFiles(customerContext.files);
     }
   }, [customerContext]);
 
@@ -65,20 +75,74 @@ export function CustomersForm({ mode }) {
     setModalOpenContext(false);
   };
 
+  const onError = () => {
+      if (addedFiles.length < 1) {
+        setAddedFilesError(true);
+      }
+  };
+
   const onSubmit = async (data: FormData) => {
-    if (mode === CREATING) {
-      createCustomer(data).then(res => {
-        setCustomersContext([res.data, ...customersContext]);
-        handleClose();
-      })
-    } else if (mode === EDITING) {
-      const result = mergeObjects(customerContext, data);
-      updateCustomer(result).then(res => {
-        setCustomersContext([res.data, ...customersContext]);
-        handleClose();
-      })
+    if (addedFiles.length < 1) {
+      setAddedFilesError(true);
+      return false;
+    } else {
+      data['files'] = addedFiles;
+
+      if (mode === CREATING) {
+        createCustomer(data).then(res => {
+          setCustomersContext([res.data, ...customersContext]);
+          handleClose();
+        })
+      } else if (mode === EDITING) {
+        const result = mergeObjects(customerContext, data);
+        updateCustomer(result).then(res => {
+          const updatedCustomers = customersContext.filter(customer => customer.id !== res.data.id);
+          setCustomersContext([res.data, ...updatedCustomers]);
+          handleClose();
+        })
+      }
     }
   }
+
+  const handleFileChange = (event) => {
+    const selectedFile = event.target.files[0];
+    const fileReader = new FileReader();
+
+    fileReader.onload = async (event) => {
+      const fileData = event.target.result;
+      setLoading(true);
+      try {
+        const response = await saveClientFiles({
+          selectedFile,
+          fileData
+        })
+
+        const {name, id} = response?.data;
+        setAddedFiles([
+          ...addedFiles,
+          {
+            name,
+            id
+          }
+        ])
+        setAddedFilesError(false);
+      } catch (error) {
+        console.error('Error uploading file:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fileReader.readAsArrayBuffer(selectedFile);
+  };
+
+  const handleDelete = async ({ name }) => {
+    const result = await deleteClientFiles(name);
+    const deletedFile = result.data.metadata;
+    const updatedFiles = addedFiles.filter(file => file.id !== deletedFile.id);
+    setAddedFiles(updatedFiles)
+
+  };
 
   return (
     <Dialog
@@ -104,7 +168,7 @@ export function CustomersForm({ mode }) {
           </Button>
         </Toolbar>
       </AppBar>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit, onError)}>
         <Card>
           <CardContent>
             <Box mb={2} sx={{ flexGrow: 1 }}>
@@ -366,6 +430,50 @@ export function CustomersForm({ mode }) {
                         />}
                       />
                     </FormGroup>
+                  </Grid>
+                  <Grid item sx={{ position: 'relative' }}>
+                    <Button
+                      component="label"
+                      role={undefined}
+                      variant="contained"
+                      tabIndex={-1}
+                      disabled={ loading || addedFiles?.length >= 6 }
+                      startIcon={<CloudUploadIcon />}
+                    >
+                      Upload file
+                      <input
+                        hidden
+                        type="file"
+                        style={hiddenInputStyles}
+                        onChange={handleFileChange}
+                        accept=".jpg, .jpeg, .png, .doc, .docx, .pdf, .file"
+                      />
+                    </Button>
+                    {addedFilesError &&  <Typography variant="body2" gutterBottom style={errorText}>You need to add at least one file</Typography>}
+                    {loading && (
+                      <CircularProgress
+                        size={24}
+                        sx={{
+                          color: '#635bff',
+                          position: 'absolute',
+                          top: '50%',
+                          left: '50%',
+                        }}
+                      />
+                    )}
+                  </Grid>
+                  <Grid item xs={12} md={12}>
+                    {
+                      addedFiles.length > 0 && addedFiles.map(file => <Chip
+                        key={file.id}
+                        label={file.name}
+                        color="primary"
+                        variant="outlined"
+                        // onClick={() => handleClick(file)}
+                        onDelete={() => handleDelete(file)}
+                        deleteIcon={<DeleteIcon />}
+                      />)
+                    }
                   </Grid>
                 </Grid>
               </Box>

@@ -40,7 +40,7 @@ export function CustomersTable() {
   const handleChangeStatus = (id:string) => {
     const array = customersContext.map(customer => {
       if (customer.id === id) {
-        return { ...custojiymer, isActive: !customer.isActive };
+        return { ...customer, isActive: !customer.isActive };
       }
       return customer;
     })
