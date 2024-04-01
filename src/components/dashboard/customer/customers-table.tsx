@@ -18,7 +18,7 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import { fetchAllCustomer, fetchCustomer, removeCustomer } from "@/components/dashboard/customer/api";
 import { CustomersForm } from "@/components/dashboard/customer/customers-form";
 import { useCustomerContext } from "@/components/dashboard/customer/customers-layout";
-import { CREATING, EDITING } from "@/components/dashboard/customer/constants";
+import { EDITING } from "@/components/dashboard/customer/constants";
 
 export function CustomersTable() {
   const {
@@ -26,6 +26,7 @@ export function CustomersTable() {
     setModalOpenContext,
     setCustomerContext,
     setCustomersContext,
+    customerContext,
     customersContext,
   } = useCustomerContext();
 
@@ -119,7 +120,7 @@ export function CustomersTable() {
       <Divider />
       {
         isModalOpenContext && <CustomersForm
-          mode={EDITING}
+          customer={customerContext}
         />
       }
     </Card>

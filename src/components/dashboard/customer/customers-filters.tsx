@@ -49,7 +49,7 @@ export function CustomersFilters() {
       </Card>
       {
         isModalOpenContext && <CustomersForm
-          mode={CREATING}
+          customer={{}}
         />
       }
     </React.Fragment>

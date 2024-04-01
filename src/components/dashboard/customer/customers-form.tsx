@@ -31,42 +31,41 @@ import Chip from "@mui/material/Chip";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { deleteClientFiles, saveClientFiles } from "@/components/dashboard/api/dropBox";
 
-export function CustomersForm({ mode }) {
+export function CustomersForm({ customer= {} }) {
   const [addedFiles, setAddedFiles] = useState<Array<any>>([]);
   const [addedFilesError, setAddedFilesError] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
   const { isModalOpenContext,
     setModalOpenContext,
-    customerContext,
     customersContext,
     setCustomersContext
   } = useCustomerContext();
 
   useEffect(() => {
-    if (mode === EDITING) {
-      setValue('companyName', customerContext.companyName);
-      setValue('electricitySelected', customerContext.electricitySelected);
-      setValue('email', customerContext.email);
-      setValue('fibreSelected',  customerContext.fibreSelected);
-      setValue('firstName', customerContext.firstName);
-      setValue('gasSelected', customerContext.gasSelected);
-      setValue('iban', customerContext.iban);
-      setValue('mobileNumber', customerContext.mobileNumber);
-      setValue('notes', customerContext.notes);
-      setValue('officeAddress', customerContext.officeAddress);
-      setValue('officeCity', customerContext.officeCity);
-      setValue('officePostCode', customerContext.officePostCode);
-      setValue('officeProvince', customerContext.officeProvince);
-      setValue('operationAddress', customerContext.operationAddress);
-      setValue('operationCity', customerContext.operationCity);
-      setValue('operationPostCode', customerContext.operationPostCode);
-      setValue('operationProvince', customerContext.operationProvince);
-      setValue('phoneNumber', customerContext.phoneNumber);
-      setValue('vat', customerContext.vat);
-      setAddedFiles(customerContext.files);
+    if (customer.id) {
+      setValue('companyName', customer.companyName);
+      setValue('electricitySelected', customer.electricitySelected);
+      setValue('email', customer.email);
+      setValue('fibreSelected',  customer.fibreSelected);
+      setValue('firstName', customer.firstName);
+      setValue('gasSelected', customer.gasSelected);
+      setValue('iban', customer.iban);
+      setValue('mobileNumber', customer.mobileNumber);
+      setValue('notes', customer.notes);
+      setValue('officeAddress', customer.officeAddress);
+      setValue('officeCity', customer.officeCity);
+      setValue('officePostCode', customer.officePostCode);
+      setValue('officeProvince', customer.officeProvince);
+      setValue('operationAddress', customer.operationAddress);
+      setValue('operationCity', customer.operationCity);
+      setValue('operationPostCode', customer.operationPostCode);
+      setValue('operationProvince', customer.operationProvince);
+      setValue('phoneNumber', customer.phoneNumber);
+      setValue('vat', customer.vat);
+      setAddedFiles(customer.files);
     }
-  }, [customerContext]);
+  }, [customer]);
 
   const { register, handleSubmit, control, formState: { errors }, setValue } = useForm<FormData>({
     resolver: yupResolver(validationSchema)
@@ -76,28 +75,28 @@ export function CustomersForm({ mode }) {
   };
 
   const onError = () => {
-      if (addedFiles.length < 1) {
+      if (addedFiles?.length < 1) {
         setAddedFilesError(true);
       }
   };
 
   const onSubmit = async (data: FormData) => {
-    if (addedFiles.length < 1) {
+    if (addedFiles?.length < 1) {
       setAddedFilesError(true);
       return false;
     } else {
       data['files'] = addedFiles;
 
-      if (mode === CREATING) {
-        createCustomer(data).then(res => {
-          setCustomersContext([res.data, ...customersContext]);
-          handleClose();
-        })
-      } else if (mode === EDITING) {
-        const result = mergeObjects(customerContext, data);
+      if (customer?.id) {
+        const result = mergeObjects(customer, data);
         updateCustomer(result).then(res => {
           const updatedCustomers = customersContext.filter(customer => customer.id !== res.data.id);
           setCustomersContext([res.data, ...updatedCustomers]);
+          handleClose();
+        })
+      } else {
+        createCustomer(data).then(res => {
+          setCustomersContext([res.data, ...customersContext]);
           handleClose();
         })
       }
@@ -464,7 +463,7 @@ export function CustomersForm({ mode }) {
                   </Grid>
                   <Grid item xs={12} md={12}>
                     {
-                      addedFiles.length > 0 && addedFiles.map(file => <Chip
+                      addedFiles?.length > 0 && addedFiles.map(file => <Chip
                         key={file.id}
                         label={file.name}
                         color="primary"

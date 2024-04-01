@@ -3,7 +3,7 @@ import axios from "axios";
 const UPLOAD_DOC_URL = 'https://content.dropboxapi.com/2/files/upload';
 const DELETE_DOC_URL = 'https://api.dropboxapi.com/2/files/delete_v2';
 const DOWNLOAD_DOC_URL = 'https://content.dropboxapi.com/2/files/download';
-const BEARER_TOKEN = 'sl.ByXeMbFtpsdIaqXsSMSyDPDztUvLLdgPNW7ri4RvLAeiSn1tdFWW7FG1bUwTrgYGxWG9CNVyHu5oDnPnOzNVrwqdTqc69AYEbcfEFbCoLQvjJ8eLm5Ic0ncR52AOgSgV-P6OmHE69gB46c8qLmU-Ayw'
+const BEARER_TOKEN = 'sl.BybVZ7RxELhu3QE00_WghTBAyHf1tcLwq-7Rk-ov0qq4G8Gyb-L66AHljJkP1yrKO45Tiz32YndU-8EXFQFbLnZ9gD85Q3svfcqArvSgfduGKzi0UbNEqSPmb5mvIm2Z0hks_scoZn6hUWJF5T-8BZI'
 
 export const saveClientFiles = async ({ selectedFile, fileData }) => {
   const headers = {
