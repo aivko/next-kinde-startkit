@@ -24,12 +24,12 @@ import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from '@mui/icons-material/Close';
 import { useCustomerContext } from "@/components/dashboard/customer/customers-layout";
-import { CREATING, EDITING } from "@/components/dashboard/customer/constants";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CircularProgress from "@mui/material/CircularProgress";
 import Chip from "@mui/material/Chip";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { deleteClientFiles, saveClientFiles } from "@/components/dashboard/api/dropBox";
+import ImageKit from "imagekit";
+import { IKContext, IKUpload } from "imagekitio-react";
 
 export function CustomersForm({ customer= {} }) {
   const [addedFiles, setAddedFiles] = useState<Array<any>>([]);
@@ -41,6 +41,28 @@ export function CustomersForm({ customer= {} }) {
     customersContext,
     setCustomersContext
   } = useCustomerContext();
+
+  const authenticator =  async () => {
+    try {
+      const imagekit = new ImageKit({
+        publicKey: "public_3KePOhstCduL+PbBlMhQP3xbLyw=",
+        privateKey : "private_ZGKnOmD8+jBaTXWGm2GrHCw0zgk=",
+        urlEndpoint: "https://ik.imagekit.io/gjo0mtzlyq",
+      });
+
+      const getCredentials = () => {
+        return new Promise((resolve,reject)=>{
+          resolve(imagekit.getAuthenticationParameters())
+        })
+      };
+
+      const data = await getCredentials();
+      const { signature, expire, token } = data;
+      return { signature, expire, token };
+    } catch (error) {
+      throw new Error(`Authentication request failed: ${error.message}`);
+    }
+  };
 
   useEffect(() => {
     if (customer.id) {
@@ -103,44 +125,27 @@ export function CustomersForm({ customer= {} }) {
     }
   }
 
-  const handleFileChange = (event) => {
-    const selectedFile = event.target.files[0];
-    const fileReader = new FileReader();
-
-    fileReader.onload = async (event) => {
-      const fileData = event.target.result;
-      setLoading(true);
-      try {
-        const response = await saveClientFiles({
-          selectedFile,
-          fileData
-        })
-
-        const {name, id} = response?.data;
-        setAddedFiles([
-          ...addedFiles,
-          {
-            name,
-            id
-          }
-        ])
-        setAddedFilesError(false);
-      } catch (error) {
-        console.error('Error uploading file:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fileReader.readAsArrayBuffer(selectedFile);
+  const onErrorIKU = (err) => {
+    console.log("Error", err);
+    setLoading(false);
   };
 
-  const handleDelete = async ({ name }) => {
-    const result = await deleteClientFiles(name);
-    const deletedFile = result.data.metadata;
-    const updatedFiles = addedFiles.filter(file => file.id !== deletedFile.id);
-    setAddedFiles(updatedFiles)
+  const onSuccessIKU = (res) => {
+    setLoading(false);
+    const { fileId, name } = res;
+    setAddedFiles([
+      ...addedFiles,
+      {
+        name,
+        id: fileId
+      }
+    ])
+  };
 
+  const handleDelete = async ({ id, name }) => {
+    const updatedFiles = addedFiles.filter(file => file.id !== id);
+    console.log(updatedFiles)
+    setAddedFiles(updatedFiles)
   };
 
   return (
@@ -440,14 +445,22 @@ export function CustomersForm({ customer= {} }) {
                       startIcon={<CloudUploadIcon />}
                     >
                       Upload file
-                      <input
-                        hidden
-                        type="file"
-                        style={hiddenInputStyles}
-                        onChange={handleFileChange}
-                        accept=".jpg, .jpeg, .png, .doc, .docx, .pdf, .file"
-                      />
+                      <IKContext
+                        publicKey="public_3KePOhstCduL+PbBlMhQP3xbLyw="
+                        urlEndpoint="https://ik.imagekit.io/gjo0mtzlyq"
+                        authenticator={authenticator}
+                      >
+                        <IKUpload
+                          hidden
+                          onError={onErrorIKU}
+                          onSuccess={onSuccessIKU}
+                          onUploadStart={() => setLoading(true)}
+                          style={hiddenInputStyles}
+                          accept=".jpg, .jpeg, .png, .doc, .docx, .pdf,"
+                        />
+                      </IKContext>
                     </Button>
+
                     {addedFilesError &&  <Typography variant="body2" gutterBottom style={errorText}>You need to add at least one file</Typography>}
                     {loading && (
                       <CircularProgress
