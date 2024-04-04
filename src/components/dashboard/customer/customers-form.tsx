@@ -132,6 +132,7 @@ export function CustomersForm({ customer= {} }) {
 
   const onSuccessIKU = (res) => {
     setLoading(false);
+    setAddedFilesError(false);
     const { fileId, name } = res;
     setAddedFiles([
       ...addedFiles,
@@ -144,8 +145,12 @@ export function CustomersForm({ customer= {} }) {
 
   const handleDelete = async ({ id, name }) => {
     const updatedFiles = addedFiles.filter(file => file.id !== id);
-    console.log(updatedFiles)
     setAddedFiles(updatedFiles)
+  };
+
+  const handleClick = async ({ id, name }) => {
+    const url = `https://ik.imagekit.io/gjo0mtzlyq/${name}`
+    window.open(url)
   };
 
   return (
@@ -443,6 +448,7 @@ export function CustomersForm({ customer= {} }) {
                       tabIndex={-1}
                       disabled={ loading || addedFiles?.length >= 6 }
                       startIcon={<CloudUploadIcon />}
+                      onClick={() => setAddedFilesError(false)}
                     >
                       Upload file
                       <IKContext
@@ -481,7 +487,7 @@ export function CustomersForm({ customer= {} }) {
                         label={file.name}
                         color="primary"
                         variant="outlined"
-                        // onClick={() => handleClick(file)}
+                        onClick={() => handleClick(file)}
                         onDelete={() => handleDelete(file)}
                         deleteIcon={<DeleteIcon />}
                       />)
