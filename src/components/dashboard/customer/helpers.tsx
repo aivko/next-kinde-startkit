@@ -60,3 +60,24 @@ export const validationSchema = Yup.object().shape({
   gasSelected: Yup.boolean().notRequired(),
   fibreSelected: Yup.boolean().notRequired(),
 });
+
+export const hiddenInputStyles = {
+  clip: 'rect(0 0 0 0)',
+  clipPath: 'inset(50%)',
+  height: 1,
+  overflow: 'hidden',
+  bottom: 0,
+  left: 0,
+  whiteSpace: 'nowrap',
+  width: 1,
+};
+
+export const errorText = {
+  color: '#f04438',
+  fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"',
+  fontWeight: 400,
+  fontSize: '0.75rem',
+  lineHeight: '1.66',
+  textAlign: 'left',
+  margin: '4px 14px 0 14px',
+};

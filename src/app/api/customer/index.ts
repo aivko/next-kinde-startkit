@@ -42,6 +42,7 @@ interface CustomerProfileData {
   notes: string;
   isVerified: boolean;
   isVerifiedBySA: boolean;
+  files: object,
 }
 
 async function createCustomerDb(payload: CustomerProfileData) {

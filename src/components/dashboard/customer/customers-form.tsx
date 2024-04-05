@@ -15,7 +15,7 @@ import Divider from "@mui/material/Divider";
 import CardActions from "@mui/material/CardActions";
 import Button from "@mui/material/Button";
 import { useForm, Controller } from "react-hook-form";
-import { FormData, Transition, validationSchema, mergeObjects } from "@/components/dashboard/customer/helpers";
+import { FormData, Transition, validationSchema, mergeObjects, hiddenInputStyles, errorText } from "@/components/dashboard/customer/helpers";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { createCustomer, updateCustomer } from "@/components/dashboard/customer/api";
 import Dialog from "@mui/material/Dialog";
@@ -24,39 +24,70 @@ import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from '@mui/icons-material/Close';
 import { useCustomerContext } from "@/components/dashboard/customer/customers-layout";
-import { CREATING, EDITING } from "@/components/dashboard/customer/constants";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import CircularProgress from "@mui/material/CircularProgress";
+import Chip from "@mui/material/Chip";
+import DeleteIcon from "@mui/icons-material/Delete";
+import ImageKit from "imagekit";
+import { IKContext, IKUpload } from "imagekitio-react";
 
-export function CustomersForm({ mode }) {
+export function CustomersForm({ customer= {} }) {
+  const [addedFiles, setAddedFiles] = useState<Array<any>>([]);
+  const [addedFilesError, setAddedFilesError] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+
   const { isModalOpenContext,
     setModalOpenContext,
-    customerContext,
     customersContext,
     setCustomersContext
   } = useCustomerContext();
 
-  useEffect(() => {
-    if (mode === EDITING) {
-      setValue('companyName', customerContext.companyName);
-      setValue('electricitySelected', customerContext.electricitySelected);
-      setValue('email', customerContext.email);
-      setValue('fibreSelected',  customerContext.fibreSelected);
-      setValue('firstName', customerContext.firstName);
-      setValue('gasSelected', customerContext.gasSelected);
-      setValue('iban', customerContext.iban);
-      setValue('mobileNumber', customerContext.mobileNumber);
-      setValue('notes', customerContext.notes);
-      setValue('officeAddress', customerContext.officeAddress);
-      setValue('officeCity', customerContext.officeCity);
-      setValue('officePostCode', customerContext.officePostCode);
-      setValue('officeProvince', customerContext.officeProvince);
-      setValue('operationAddress', customerContext.operationAddress);
-      setValue('operationCity', customerContext.operationCity);
-      setValue('operationPostCode', customerContext.operationPostCode);
-      setValue('operationProvince', customerContext.operationProvince);
-      setValue('phoneNumber', customerContext.phoneNumber);
-      setValue('vat', customerContext.vat);
+  const authenticator =  async () => {
+    try {
+      const imagekit = new ImageKit({
+        publicKey: "public_3KePOhstCduL+PbBlMhQP3xbLyw=",
+        privateKey : "private_ZGKnOmD8+jBaTXWGm2GrHCw0zgk=",
+        urlEndpoint: "https://ik.imagekit.io/gjo0mtzlyq",
+      });
+
+      const getCredentials = () => {
+        return new Promise((resolve,reject)=>{
+          resolve(imagekit.getAuthenticationParameters())
+        })
+      };
+
+      const data = await getCredentials();
+      const { signature, expire, token } = data;
+      return { signature, expire, token };
+    } catch (error) {
+      throw new Error(`Authentication request failed: ${error.message}`);
     }
-  }, [customerContext]);
+  };
+
+  useEffect(() => {
+    if (customer.id) {
+      setValue('companyName', customer.companyName);
+      setValue('electricitySelected', customer.electricitySelected);
+      setValue('email', customer.email);
+      setValue('fibreSelected',  customer.fibreSelected);
+      setValue('firstName', customer.firstName);
+      setValue('gasSelected', customer.gasSelected);
+      setValue('iban', customer.iban);
+      setValue('mobileNumber', customer.mobileNumber);
+      setValue('notes', customer.notes);
+      setValue('officeAddress', customer.officeAddress);
+      setValue('officeCity', customer.officeCity);
+      setValue('officePostCode', customer.officePostCode);
+      setValue('officeProvince', customer.officeProvince);
+      setValue('operationAddress', customer.operationAddress);
+      setValue('operationCity', customer.operationCity);
+      setValue('operationPostCode', customer.operationPostCode);
+      setValue('operationProvince', customer.operationProvince);
+      setValue('phoneNumber', customer.phoneNumber);
+      setValue('vat', customer.vat);
+      setAddedFiles(customer.files);
+    }
+  }, [customer]);
 
   const { register, handleSubmit, control, formState: { errors }, setValue } = useForm<FormData>({
     resolver: yupResolver(validationSchema)
@@ -65,20 +96,62 @@ export function CustomersForm({ mode }) {
     setModalOpenContext(false);
   };
 
+  const onError = () => {
+      if (addedFiles?.length < 1) {
+        setAddedFilesError(true);
+      }
+  };
+
   const onSubmit = async (data: FormData) => {
-    if (mode === CREATING) {
-      createCustomer(data).then(res => {
-        setCustomersContext([res.data, ...customersContext]);
-        handleClose();
-      })
-    } else if (mode === EDITING) {
-      const result = mergeObjects(customerContext, data);
-      updateCustomer(result).then(res => {
-        setCustomersContext([res.data, ...customersContext]);
-        handleClose();
-      })
+    if (addedFiles?.length < 1) {
+      setAddedFilesError(true);
+      return false;
+    } else {
+      data['files'] = addedFiles;
+
+      if (customer?.id) {
+        const result = mergeObjects(customer, data);
+        updateCustomer(result).then(res => {
+          const updatedCustomers = customersContext.filter(customer => customer.id !== res.data.id);
+          setCustomersContext([res.data, ...updatedCustomers]);
+          handleClose();
+        })
+      } else {
+        createCustomer(data).then(res => {
+          setCustomersContext([res.data, ...customersContext]);
+          handleClose();
+        })
+      }
     }
   }
+
+  const onErrorIKU = (err) => {
+    console.log("Error", err);
+    setLoading(false);
+  };
+
+  const onSuccessIKU = (res) => {
+    setLoading(false);
+    setAddedFilesError(false);
+    const { fileId, name } = res;
+    setAddedFiles([
+      ...addedFiles,
+      {
+        name,
+        id: fileId
+      }
+    ])
+  };
+
+  const handleDelete = async ({ id, name }) => {
+    const updatedFiles = addedFiles.filter(file => file.id !== id);
+    setAddedFiles(updatedFiles)
+  };
+
+  const handleClick = async ({ id, name }) => {
+    const url = `https://ik.imagekit.io/gjo0mtzlyq/${name}`
+    window.open(url)
+  };
 
   return (
     <Dialog
@@ -104,7 +177,7 @@ export function CustomersForm({ mode }) {
           </Button>
         </Toolbar>
       </AppBar>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit, onError)}>
         <Card>
           <CardContent>
             <Box mb={2} sx={{ flexGrow: 1 }}>
@@ -366,6 +439,59 @@ export function CustomersForm({ mode }) {
                         />}
                       />
                     </FormGroup>
+                  </Grid>
+                  <Grid item sx={{ position: 'relative' }}>
+                    <Button
+                      component="label"
+                      role={undefined}
+                      variant="contained"
+                      tabIndex={-1}
+                      disabled={ loading || addedFiles?.length >= 6 }
+                      startIcon={<CloudUploadIcon />}
+                      onClick={() => setAddedFilesError(false)}
+                    >
+                      Upload file
+                      <IKContext
+                        publicKey="public_3KePOhstCduL+PbBlMhQP3xbLyw="
+                        urlEndpoint="https://ik.imagekit.io/gjo0mtzlyq"
+                        authenticator={authenticator}
+                      >
+                        <IKUpload
+                          hidden
+                          onError={onErrorIKU}
+                          onSuccess={onSuccessIKU}
+                          onUploadStart={() => setLoading(true)}
+                          style={hiddenInputStyles}
+                          accept=".jpg, .jpeg, .png, .doc, .docx, .pdf,"
+                        />
+                      </IKContext>
+                    </Button>
+
+                    {addedFilesError &&  <Typography variant="body2" gutterBottom style={errorText}>You need to add at least one file</Typography>}
+                    {loading && (
+                      <CircularProgress
+                        size={24}
+                        sx={{
+                          color: '#635bff',
+                          position: 'absolute',
+                          top: '50%',
+                          left: '50%',
+                        }}
+                      />
+                    )}
+                  </Grid>
+                  <Grid item xs={12} md={12}>
+                    {
+                      addedFiles?.length > 0 && addedFiles.map(file => <Chip
+                        key={file.id}
+                        label={file.name}
+                        color="primary"
+                        variant="outlined"
+                        onClick={() => handleClick(file)}
+                        onDelete={() => handleDelete(file)}
+                        deleteIcon={<DeleteIcon />}
+                      />)
+                    }
                   </Grid>
                 </Grid>
               </Box>

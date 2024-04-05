@@ -60,4 +60,5 @@ model Customer {
   electricitySelected Boolean  @default(false)
   gasSelected         Boolean  @default(false)
   fibreSelected       Boolean  @default(false)
+  files               Json
 }
