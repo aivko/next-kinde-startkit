@@ -17,16 +17,19 @@ import {
   fetchAdmin,
   createAdmin,
   updateAdmin,
-} from "@/components/dashboard/account/api";
+  fetchAgencies,
+} from "@/components/dashboard/agency/api";
 import {
   validationSchema,
   FormData,
-} from "@/components/dashboard/account/constants";
-import { AccountInfo } from '@/components/dashboard/account/account-info';
+} from "@/components/dashboard/agency/constants";
+import { AgencyCard } from '@/components/dashboard/agency/agency-card';
+import CircularIndeterminate from '@/components/dashboard/shared/CircularIndeterminate';
 
-export function AccountDetailsForm(): React.JSX.Element {
+export function AgencyCreateForm(): React.JSX.Element {
   const [adminInfo, setAdminInfo] = useState<FormData | {}>({});
   const [isFormEditing, setFormEditing] = useState<boolean>(false);
+  const [isLoading, setLoading] = useState<boolean>(true);
 
   const { register, handleSubmit, formState: { errors }, setValue } = useForm<FormData>({
     resolver: yupResolver(validationSchema)
@@ -63,6 +66,8 @@ export function AccountDetailsForm(): React.JSX.Element {
       setAdminInfo(res.data);
     } catch (error) {
       console.error('Error fetching profile data:', error);
+    } finally {
+      setLoading(false);
     }
   };
   const onSubmit = async (data: FormData) => {
@@ -77,7 +82,10 @@ export function AccountDetailsForm(): React.JSX.Element {
   return (
     <>
       {
-        !isFormEditing && <AccountInfo
+        isLoading && <CircularIndeterminate />
+      }
+      {
+        !isFormEditing && <AgencyCard
           adminInfo={adminInfo}
           handleFormEditing={handleFormEditing}
         />

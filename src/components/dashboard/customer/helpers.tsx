@@ -2,7 +2,7 @@ import React from "react";
 import { TransitionProps } from "@mui/material/transitions";
 import Slide from "@mui/material/Slide";
 import * as Yup from "yup";
-import { phoneRegExp } from "@/components/dashboard/account/constants";
+import { phoneRegExp } from "@/components/dashboard/agency/constants";
 
 export const mergeObjects = (mainObj, obj) => {
   return { ...mainObj, ...obj };
