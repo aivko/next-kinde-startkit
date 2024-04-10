@@ -35,6 +35,7 @@ model Admins {
   notes               String   @default("")
   isVerified          Boolean  @default(false)
   isVerifiedBySA      Boolean  @default(false)
+  isSuperAdmin        Boolean  @default(false)
 }
 
 model Customer {

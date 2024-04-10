@@ -6,7 +6,8 @@ interface RequestOptions {
 
 const handleResponse = async (response: Response) => {
   if (!response.ok) {
-    throw new Error('Failed to send data to backend');
+    console.log(response);
+    throw new Error(`Failed to send data to backend, ${response}`);
   }
   return await response.json();
 };

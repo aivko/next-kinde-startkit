@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect, useState } from "react";
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -8,6 +8,8 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
+import AgencyTable from './agency-table'
+import { fetchAgencies } from "@/components/dashboard/agency/api";
 
 interface AdminInfo {
   email: string;
@@ -28,6 +30,7 @@ interface AdminInfo {
   mobileNumber: string;
   notes: string;
   isVerified: boolean;
+  isSuperAdmin: boolean;
 }
 
 interface AccountInfoProps {
@@ -35,7 +38,17 @@ interface AccountInfoProps {
   handleFormEditing: () => void;
 }
 
-export const AccountInfo: FC<AccountInfoProps> = ({ adminInfo, handleFormEditing }) => {
+export const AgencyCard: FC<AccountInfoProps> = ({ adminInfo, handleFormEditing }) => {
+  const [agencies, setAgencies] = useState< []>([]);
+
+  useEffect(() => {
+    if (adminInfo.isSuperAdmin) {
+      fetchAgencies()
+        .then(res => setAgencies(res.data));
+    }
+  }, [adminInfo]);
+
+
   return (
     <Grid container spacing={3}>
       <Grid item lg={6} md={8} xs={12}>
@@ -45,13 +58,16 @@ export const AccountInfo: FC<AccountInfoProps> = ({ adminInfo, handleFormEditing
               <Stack spacing={1} sx={{ textAlign: 'center' }}>
                 <Typography variant="h5">{adminInfo.firstName}</Typography>
                 <Typography color="text.secondary" variant="body2">
-                  {adminInfo.companyName}
+                  <b>Nome della ditta:</b> {adminInfo.companyName}
                 </Typography>
                 <Typography color="text.secondary" variant="body2">
-                  {adminInfo.email}
+                  <b>Email:</b> {adminInfo.email}
                 </Typography>
                 <Typography color="text.secondary" variant="body2">
-                  {adminInfo.phoneNumber}
+                  <b>Numero di telefono:</b> {adminInfo.phoneNumber}
+                </Typography>
+                <Typography color="text.secondary" variant="body2">
+                  <b>Ruolo:</b> { adminInfo.isSuperAdmin ? 'Super Amministratore' : 'Agenzia' }
                 </Typography>
                 <Chip label={ adminInfo.isVerified ? 'verificato' : 'non verificato' } color={ adminInfo.isVerified ? 'success' : 'primary' } variant="outlined" />
               </Stack>
@@ -69,6 +85,10 @@ export const AccountInfo: FC<AccountInfoProps> = ({ adminInfo, handleFormEditing
           </CardActions>
         </Card>
       </Grid>
+      { adminInfo.isSuperAdmin && <Grid item lg={12} md={12} xs={12}>
+        <Typography mb={2} variant="h5">Elenco Agenzie</Typography>
+        <AgencyTable agencies={agencies} />
+      </Grid> }
     </Grid>
   );
 };
