@@ -23,7 +23,6 @@ import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from '@mui/icons-material/Close';
-import { useCustomerContext } from "@/components/dashboard/customer/customers-layout";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CircularProgress from "@mui/material/CircularProgress";
 import Chip from "@mui/material/Chip";
@@ -31,17 +30,10 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import ImageKit from "imagekit";
 import { IKContext, IKUpload } from "imagekitio-react";
 
-export function CustomersForm({ customer= {} }) {
+export function ClientForm({ customer= {}, isModalOpen = false, customers = [], setCustomers, setModalOpen }) {
   const [addedFiles, setAddedFiles] = useState<Array<any>>([]);
   const [addedFilesError, setAddedFilesError] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-
-  const {
-    isModalOpenContext,
-    setModalOpenContext,
-    customersContext,
-    setCustomersContext
-  } = useCustomerContext();
 
   const authenticator =  async () => {
     try {
@@ -94,13 +86,13 @@ export function CustomersForm({ customer= {} }) {
     resolver: yupResolver(validationSchema)
   });
   const handleClose = () => {
-    setModalOpenContext(false);
+    setModalOpen(false);
   };
 
   const onError = () => {
-      if (addedFiles?.length < 1) {
-        setAddedFilesError(true);
-      }
+    if (addedFiles?.length < 1) {
+      setAddedFilesError(true);
+    }
   };
 
   const onSubmit = async (data: FormData) => {
@@ -113,13 +105,13 @@ export function CustomersForm({ customer= {} }) {
       if (customer?.id) {
         const result = mergeObjects(customer, data);
         updateCustomer(result).then(res => {
-          const updatedCustomers = customersContext.filter(customer => customer.id !== res.data.id);
-          setCustomersContext([res.data, ...updatedCustomers]);
+          const updatedCustomers = customers.filter(customer => customer.id !== res.data.id);
+          setCustomers([res.data, ...updatedCustomers]);
           handleClose();
         })
       } else {
         createCustomer(data).then(res => {
-          setCustomersContext([res.data, ...customersContext]);
+          setCustomers([res.data, ...customers]);
           handleClose();
         })
       }
@@ -127,7 +119,6 @@ export function CustomersForm({ customer= {} }) {
   }
 
   const onErrorIKU = (err) => {
-    console.log("Error", err);
     setLoading(false);
   };
 
@@ -157,7 +148,7 @@ export function CustomersForm({ customer= {} }) {
   return (
     <Dialog
       fullScreen
-      open={isModalOpenContext}
+      open={isModalOpen}
       onClose={handleClose}
       TransitionComponent={Transition}
     >
