@@ -16,11 +16,15 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
 import { fetchAllCustomer, fetchCustomer, removeCustomer } from "@/components/dashboard/customer/api";
-import { CustomersForm } from "@/components/dashboard/customer/customers-form";
+import { ClientForm } from "@/components/dashboard/shared/ClientForm";
 import { useCustomerContext } from "@/components/dashboard/customer/customers-layout";
-import { EDITING } from "@/components/dashboard/customer/constants";
+import CircularIndeterminate from '@/components/dashboard/shared/CircularIndeterminate';
+import { fetchAdmin } from "@/components/dashboard/agency/api";
 
 export function CustomersTable() {
+  const [isLoading, setLoading] = useState<boolean>(true);
+  const [agencyId, setAgencyId] = useState<string>('');
+
   const {
     isModalOpenContext,
     setModalOpenContext,
@@ -31,11 +35,20 @@ export function CustomersTable() {
   } = useCustomerContext();
 
   useEffect(() => {
-    fetchAllCustomer().then(res => {
-      // hack to show last added customers first
-      const customersList = res.data || [];
-      setCustomersContext(customersList.reverse());
-    });
+    fetchAdmin().then(res => {
+      const { id } = res.data;
+      setAgencyId(id);
+      fetchAllCustomer({ id })
+        .then(res => {
+          // show last added customers first
+          const customersList = res.data || [];
+          setCustomersContext(customersList.reverse());
+      })
+        .then(() => {
+          setLoading(false);
+        });
+    })
+
   }, []);
 
   const handleChangeStatus = (id:string) => {
@@ -50,9 +63,20 @@ export function CustomersTable() {
   };
 
   const handleEdit = async (id: string) => {
-    const customer = await fetchCustomer(id);
+    const customer = await fetchCustomer({
+      customerId: id,
+      agencyId
+    });
     setCustomerContext(customer.data);
     setModalOpenContext(true);
+  };
+
+  const handleCustomers = async (value) => {
+    setCustomersContext(value)
+  };
+
+  const handleModal = async (value:boolean) => {
+    setModalOpenContext(value);
   };
 
   const handleDelete = async (id:string) => {
@@ -67,16 +91,19 @@ export function CustomersTable() {
 
   return (
     <Card>
+      {
+        isLoading && <CircularIndeterminate />
+      }
       <Box sx={{ overflowX: 'auto' }}>
         <Table sx={{ minWidth: '800px' }}>
           <TableHead>
             <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Company name</TableCell>
+              <TableCell>Nome</TableCell>
+              <TableCell>Nome della ditta</TableCell>
               <TableCell>Email</TableCell>
-              <TableCell>Phone</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Actions</TableCell>
+              <TableCell>Telefono</TableCell>
+              <TableCell>Stato</TableCell>
+              <TableCell>Azioni</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -119,8 +146,12 @@ export function CustomersTable() {
       </Box>
       <Divider />
       {
-        isModalOpenContext && <CustomersForm
+        isModalOpenContext && <ClientForm
           customer={customerContext}
+          customers={customersContext}
+          isModalOpen={isModalOpenContext}
+          setCustomers={handleCustomers}
+          setModalOpen={handleModal}
         />
       }
     </Card>

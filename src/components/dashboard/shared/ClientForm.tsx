@@ -9,7 +9,6 @@ import Grid from "@mui/material/Grid";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import TextField from "@mui/material/TextField";
-import FormGroup from "@mui/material/FormGroup";
 import Checkbox from "@mui/material/Checkbox";
 import Divider from "@mui/material/Divider";
 import CardActions from "@mui/material/CardActions";
@@ -26,14 +25,23 @@ import CloseIcon from '@mui/icons-material/Close';
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CircularProgress from "@mui/material/CircularProgress";
 import Chip from "@mui/material/Chip";
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+
 import DeleteIcon from "@mui/icons-material/Delete";
 import ImageKit from "imagekit";
 import { IKContext, IKUpload } from "imagekitio-react";
 
-export function ClientForm({ customer= {}, isModalOpen = false, customers = [], setCustomers, setModalOpen }) {
+export function ClientForm({ customer= {}, isModalOpen = false, customers = [], setCustomers, setModalOpen, role = '' }) {
   const [addedFiles, setAddedFiles] = useState<Array<any>>([]);
   const [addedFilesError, setAddedFilesError] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [fibreSelected, setFibreSelected] = useState<boolean>(false);
+  const [podStatus, setPodStatus] = useState<string>('');
+  const [pdrStatus, setPdrStatus] = useState<string>('');
 
   const authenticator =  async () => {
     try {
@@ -78,29 +86,50 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
       setValue('operationProvince', customer.operationProvince);
       setValue('phoneNumber', customer.phoneNumber);
       setValue('vat', customer.vat);
+      setValue('pdr', customer.pdr);
+      setValue('pod', customer.pod);
+      setValue('pod_transfer', customer.pod_transfer);
+      setValue('pdr_transfer', customer.pdr_transfer);
       setAddedFiles(customer.files);
     }
   }, [customer]);
 
   const { register, handleSubmit, control, formState: { errors }, setValue } = useForm<FormData>({
-    resolver: yupResolver(validationSchema)
+    resolver: yupResolver(validationSchema),
+    mode: "all"
   });
   const handleClose = () => {
     setModalOpen(false);
   };
 
-  const onError = () => {
+  const handleChange = () => {
+    console.log('sdvsdvsdv')
+  };
+
+  const handleChangeSelectPOD = (event: SelectChangeEvent) => {
+    setPodStatus(event.target.value);
+  };
+
+  const handleChangeSelectPDR = (event: SelectChangeEvent) => {
+    setPdrStatus(event.target.value);
+  };
+
+  const onError = (error) => {
+    console.log(error)
     if (addedFiles?.length < 1) {
       setAddedFilesError(true);
     }
   };
 
   const onSubmit = async (data: FormData) => {
+    console.log(data)
     if (addedFiles?.length < 1) {
       setAddedFilesError(true);
       return false;
     } else {
       data['files'] = addedFiles;
+      data['pod_status'] = podStatus;
+      data['pdr_status'] = pdrStatus;
 
       if (customer?.id) {
         const result = mergeObjects(customer, data);
@@ -174,16 +203,18 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
           <CardContent>
             <Box mb={2} sx={{ flexGrow: 1 }}>
               <Typography variant="h5" gutterBottom mb={1} >
-                Informazioni aziendali
+                Cliente
               </Typography>
               <Box mt={2} mb={4}>
                 <Grid container spacing={3}>
                   <Grid item xs={6} md={3}>
-                    <FormControl fullWidth>
+                    <FormControl fullWidth required>
                       <TextField
+                        error={Boolean(errors.companyName)}
                         id="outlined-error-helper-text"
-                        label="Ragione sociale"
+                        label="Ragione sociale / Cognome *"
                         variant="outlined"
+                        helperText={errors?.companyName?.message}
                         {...register('companyName')}
                         InputLabelProps={{ shrink: true }}
                         size="small"
@@ -195,7 +226,7 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
                       <TextField
                         error={Boolean(errors.firstName)}
                         id="outlined-error-helper-text"
-                        label="Nome cognome Titolare*"
+                        label="Nome titolare *"
                         helperText={errors?.firstName?.message}
                         variant="outlined"
                         {...register('firstName')}
@@ -209,7 +240,7 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
                       <TextField
                         error={Boolean(errors.vat)}
                         id="outlined-error-helper-text"
-                        label="Partita IVA*"
+                        label="Partita IVA/ C.F. *"
                         helperText={errors?.vat?.message}
                         variant="outlined"
                         {...register('vat')}
@@ -223,7 +254,7 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
                       <TextField
                         error={Boolean(errors.iban)}
                         id="outlined-error-helper-text"
-                        label="IBAN (per pagamento provvigioni)*"
+                        label="IBAN (Accredito bollete) *"
                         helperText={errors?.iban?.message}
                         variant="outlined"
                         {...register('iban')}
@@ -289,9 +320,11 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
                     </FormControl>
                   </Grid>
                   <Grid item xs={6} md={3}>
-                    <FormControl fullWidth>
+                    <FormControl fullWidth required>
                       <TextField
-                        label="Indirizzo Sede Operative"
+                        error={Boolean(errors.operationAddress)}
+                        helperText={errors?.operationAddress?.message}
+                        label="Indirizzo fornitura (completo di civico) *"
                         InputLabelProps={{ shrink: true }}
                         {...register('operationAddress')}
                         size="small"
@@ -299,9 +332,11 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
                     </FormControl>
                   </Grid>
                   <Grid item xs={6} md={3}>
-                    <FormControl fullWidth>
+                    <FormControl fullWidth required>
                       <TextField
-                        label="CAP"
+                        error={Boolean(errors.operationPostCode)}
+                        helperText={errors?.operationPostCode?.message}
+                        label="CAP *"
                         InputLabelProps={{ shrink: true }}
                         {...register('operationPostCode')}
                         size="small"
@@ -309,9 +344,11 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
                     </FormControl>
                   </Grid>
                   <Grid item xs={6} md={3}>
-                    <FormControl fullWidth>
+                    <FormControl fullWidth required>
                       <TextField
-                        label="Città"
+                        error={Boolean(errors.operationCity)}
+                        helperText={errors?.operationCity?.message}
+                        label="Città *"
                         InputLabelProps={{ shrink: true }}
                         {...register('operationCity')}
                         size="small"
@@ -319,9 +356,11 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
                     </FormControl>
                   </Grid>
                   <Grid item xs={6} md={3}>
-                    <FormControl fullWidth>
+                    <FormControl fullWidth required>
                       <TextField
-                        label="Provincia"
+                        error={Boolean(errors.operationProvince)}
+                        helperText={errors?.operationProvince?.message}
+                        label="Provincia *"
                         InputLabelProps={{ shrink: true }}
                         {...register('operationProvince')}
                         size="small"
@@ -352,26 +391,24 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
                   <Grid item xs={6} md={3}>
                     <FormControl fullWidth required>
                       <TextField
-                        error={Boolean(errors.phoneNumber)}
+                        error={Boolean(errors.mobileNumber)}
                         id="outlined-error-helper-text"
-                        label="Tell*"
-                        helperText={errors?.phoneNumber?.message}
+                        label="Cellufare *"
+                        helperText={errors?.mobileNumber?.message}
                         variant="outlined"
-                        {...register('phoneNumber')}
+                        {...register('mobileNumber')}
                         InputLabelProps={{ shrink: true }}
                         size="small"
                       />
                     </FormControl>
                   </Grid>
                   <Grid item xs={6} md={3}>
-                    <FormControl fullWidth required>
+                    <FormControl fullWidth>
                       <TextField
-                        error={Boolean(errors.mobileNumber)}
                         id="outlined-error-helper-text"
-                        label="Cell*"
-                        helperText={errors?.mobileNumber?.message}
+                        label="Telefono"
                         variant="outlined"
-                        {...register('mobileNumber')}
+                        {...register('phoneNumber')}
                         InputLabelProps={{ shrink: true }}
                         size="small"
                       />
@@ -381,56 +418,235 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
                     <Typography variant="h5" gutterBottom mb={1}>
                       Cliente Servizi
                     </Typography>
-                    <FormGroup sx={{position: 'flex', flexDirection: 'row', alignItems:'center'}}>
+                    <Box
+                      mb={2}
+                      pt={1}
+                      pb={1}
+                      sx={{
+                        width: '100%',
+                        borderRadius: 1,
+                        border: '1px solid grey',
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems:'center'
+                      }}
+                    >
+                      <Grid
+                        container
+                        spacing={3}
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          alignItems:'center'
+                        }}
+                      >
+                        <Grid item>
+                          <FormControlLabel
+                            labelPlacement="bottom"
+                            label="Luce"
+                            control={<Controller
+                              control={control}
+                              name="electricitySelected"
+                              defaultValue={false}
+                              {...register('electricitySelected')}
+                              render={({ field: { onChange, onBlur, value } }) => (
+                                <Checkbox
+                                  onChange={onChange}
+                                  onBlur={onBlur}
+                                  checked={!!value}
+                                />
+                              )}
+                            />}
+                          />
+                        </Grid>
 
-                      <FormControlLabel
-                        labelPlacement="bottom"
-                        label="Luce"
-                        control={<Controller
-                          control={control}
-                          name="electricitySelected"
-                          render={({ field: { onChange, onBlur, value, ref } }) => (
-                            <Checkbox
-                              onChange={onChange}
-                              onBlur={onBlur}
-                              checked={value}
+                        <Grid item xs={4} md={4}>
+                          <FormControl fullWidth required>
+                            <TextField
+                              error={Boolean(errors.pod)}
+                              helperText={errors?.pod?.message}
+                              label="POD *"
+                              InputLabelProps={{ shrink: true }}
+                              {...register('pod')}
+                              size="small"
                             />
-                          )}
-                        />}
-                      />
-
-                      <FormControlLabel
-                        labelPlacement="bottom"
-                        label="Gas"
-                        control={<Controller
-                          control={control}
-                          name="gasSelected"
-                          render={({ field: { onChange, onBlur, value, ref } }) => (
-                            <Checkbox
-                              onChange={onChange}
-                              onBlur={onBlur}
-                              checked={value}
+                          </FormControl>
+                        </Grid>
+                        <Grid item>
+                          <RadioGroup
+                            row
+                            name="pod-radio-buttons-group"
+                            defaultValue={customer?.pod_transfer || "pod_voltura"}
+                          >
+                            <FormControlLabel
+                              value="pod_voltura"
+                              label="Voltura"
+                              {...register('pod_transfer')}
+                              control={<Radio />}
                             />
-                          )}
-                        />}
-                      />
+                            <FormControlLabel
+                              value="pod_nuova"
+                              label="Nuova attivazione"
+                              {...register('pod_transfer')}
+                              control={<Radio />}
+                            />
+                          </RadioGroup>
+                        </Grid>
 
+                        <Grid item>
+                          <FormControl
+                            sx={{ m: 1, minWidth: 180 }}
+                            size="small"
+                            disabled={role !== 'super_admin'}
+                          >
+                            <InputLabel
+                              id="demo-select-small-label"
+                            >Stato del cliente</InputLabel>
+                            <Select
+                              labelId="demo-select-small-label"
+                              id="light-select"
+                              value={podStatus}
+                              onChange={handleChangeSelectPOD}
+                            >
+                              <MenuItem value="progress">In corso</MenuItem>
+                              <MenuItem value="done">Fatta</MenuItem>
+                              <MenuItem value="disabled">Disabilitata</MenuItem>
+                            </Select>
+                          </FormControl>
+                        </Grid>
+                      </Grid>
+                    </Box>
+
+                    <Box
+                      mb={2}
+                      pt={1}
+                      pb={1}
+                      sx={{
+                        width: '100%',
+                        borderRadius: 1,
+                        border: '1px solid grey'
+                      }}
+                    >
+
+                      <Grid
+                        container
+                        spacing={3}
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          alignItems:'center'
+                        }}
+                      >
+                        <Grid item>
+                          <FormControlLabel
+                            labelPlacement="bottom"
+                            label="Gas"
+                            control={<Controller
+                              control={control}
+                              name="gasSelected"
+                              defaultValue={false}
+                              {...register('gasSelected')}
+                              render={({ field: { onChange, onBlur, value } }) => (
+                                <Checkbox
+                                  onChange={onChange}
+                                  onBlur={onBlur}
+                                  checked={value}
+                                />
+                              )}
+                            />}
+                          />
+                        </Grid>
+
+                        <Grid item xs={4} md={4}>
+                          <FormControl fullWidth required>
+                            <TextField
+                              error={Boolean(errors.pdr)}
+                              helperText={errors?.pdr?.message}
+                              label="PDR *"
+                              InputLabelProps={{ shrink: true }}
+                              {...register('pdr')}
+                              size="small"
+                            />
+                          </FormControl>
+                        </Grid>
+                        <Grid item>
+                          <RadioGroup
+                            row
+                            name="pdr-radio-buttons-group"
+                            defaultValue={customer?.pdr_transfer || "pdr_voltura"}
+                          >
+                            <FormControlLabel
+                              value="pdr_voltura"
+                              label="Voltura"
+                              {...register('pdr_transfer')}
+                              control={<Radio />}
+                            />
+                            <FormControlLabel
+                              value="pdr_nuova"
+                              label="Nuova attivazione"
+                              {...register('pdr_transfer')}
+                              control={<Radio />}
+                            />
+                          </RadioGroup>
+                        </Grid>
+
+                        <Grid item>
+                          <FormControl
+                            sx={{ m: 1, minWidth: 180 }}
+                            size="small"
+                            disabled={role !== 'super_admin'}
+                          >
+                            <InputLabel
+                              id="demo-select-small-label">
+                              Stato del cliente
+                            </InputLabel>
+                            <Select
+                              labelId="demo-select-small-label"
+                              id="gas-select"
+                              value={pdrStatus}
+                              onChange={handleChangeSelectPDR}
+                            >
+                              <MenuItem value="progress">In corso</MenuItem>
+                              <MenuItem value="done">Fatta</MenuItem>
+                              <MenuItem value="disabled">Disabilitata</MenuItem>
+                            </Select>
+                          </FormControl>
+                        </Grid>
+                      </Grid>
+                    </Box>
+
+                    <Box
+                      pt={1}
+                      pb={1}
+                      sx={{
+                        width: '100%',
+                        borderRadius: 1,
+                        border: '1px solid grey'
+                      }}
+                    >
                       <FormControlLabel
                         labelPlacement="bottom"
                         label="Fibra"
                         control={<Controller
                           control={control}
                           name="fibreSelected"
-                          render={({ field: { onChange, onBlur, value, ref } }) => (
+                          defaultValue={false}
+                          {...register('fibreSelected')}
+                          render={({ field: { onChange, onBlur, value } }) => (
                             <Checkbox
-                              onChange={onChange}
                               onBlur={onBlur}
-                              checked={value}
+                              checked={!!value}
+                              onChange={(e) => {
+                                onChange(e.target.checked);
+                                handleChange(e.target.checked);
+                              }}
                             />
                           )}
                         />}
                       />
-                    </FormGroup>
+                    </Box>
+
+                    {errors?.electricitySelected &&  <Typography variant="body2" gutterBottom style={errorText}>{ errors.electricitySelected.message }</Typography>}
                   </Grid>
                   <Grid item sx={{ position: 'relative' }}>
                     <Button
@@ -442,7 +658,7 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
                       startIcon={<CloudUploadIcon />}
                       onClick={() => setAddedFilesError(false)}
                     >
-                      Upload file
+                      Caricare files
                       <IKContext
                         publicKey="public_3KePOhstCduL+PbBlMhQP3xbLyw="
                         urlEndpoint="https://ik.imagekit.io/gjo0mtzlyq"
@@ -459,7 +675,11 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
                       </IKContext>
                     </Button>
 
-                    {addedFilesError &&  <Typography variant="body2" gutterBottom style={errorText}>You need to add at least one file</Typography>}
+                    {addedFilesError &&  <Typography variant="body2" gutterBottom style={errorText}>
+                      Documento riconoscimento <br/>
+                      Bolletta luce / gas <br/>
+                      Nofece fiscale / Tesseta sanitaria
+                    </Typography>}
                     {loading && (
                       <CircularProgress
                         size={24}
@@ -517,7 +737,7 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
               type="submit"
               variant="contained"
             >
-              Salva
+              Invia
             </Button>
           </CardActions>
         </Card>

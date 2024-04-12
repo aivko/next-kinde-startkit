@@ -37,7 +37,7 @@ const columns: readonly Column[] = [
   { id: 'action', label: 'Azione' },
 ];
 
-export default function AgencyTable({ agencies }) {
+export default function AgencyTable({ agencies, adminInfo }) {
   const [isModalOpen, setModalOpen] = React.useState<boolean | false>(false);
   const [expanded, setExpanded] = React.useState<string | false>(false);
   const [customer, setCustomer] = React.useState<{}>({});
@@ -49,16 +49,14 @@ export default function AgencyTable({ agencies }) {
   };
 
   const handleViewClients = (id: string) => {
-    fetchAllCustomer(id).then(res => setCustomers(res.data))
+    fetchAllCustomer({ id }).then(res => setCustomers(res.data))
   }
 
-  const handleModal = (val) => {
-    console.log(val);
+  const handleModal = (val:boolean) => {
     setModalOpen(val);
   };
 
   const handleCustomers = (val) => {
-    console.log(val);
     setCustomers(val);
   };
 
@@ -197,8 +195,9 @@ export default function AgencyTable({ agencies }) {
             }
             {
               customer?.id && <ClientForm
+                role={adminInfo.role}
                 customer={customer}
-                customers={[]}
+                customers={customers}
                 isModalOpen={isModalOpen}
                 setCustomers={handleCustomers}
                 setModalOpen={handleModal}

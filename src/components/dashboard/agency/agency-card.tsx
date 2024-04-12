@@ -30,7 +30,7 @@ interface AdminInfo {
   mobileNumber: string;
   notes: string;
   isVerified: boolean;
-  isSuperAdmin: boolean;
+  role: string;
 }
 
 interface AccountInfoProps {
@@ -42,7 +42,7 @@ export const AgencyCard: FC<AccountInfoProps> = ({ adminInfo, handleFormEditing 
   const [agencies, setAgencies] = useState< []>([]);
 
   useEffect(() => {
-    if (adminInfo.isSuperAdmin) {
+    if (adminInfo.role === 'super_admin') {
       fetchAgencies()
         .then(res => setAgencies(res.data));
     }
@@ -67,7 +67,7 @@ export const AgencyCard: FC<AccountInfoProps> = ({ adminInfo, handleFormEditing 
                   <b>Numero di telefono:</b> {adminInfo.phoneNumber}
                 </Typography>
                 <Typography color="text.secondary" variant="body2">
-                  <b>Ruolo:</b> { adminInfo.isSuperAdmin ? 'Super Amministratore' : 'Agenzia' }
+                  <b>Ruolo:</b> { adminInfo.role === 'super_admin' ? 'Super Amministratore' : 'Agenzia' }
                 </Typography>
                 <Chip label={ adminInfo.isVerified ? 'verificato' : 'non verificato' } color={ adminInfo.isVerified ? 'success' : 'primary' } variant="outlined" />
               </Stack>
@@ -85,9 +85,12 @@ export const AgencyCard: FC<AccountInfoProps> = ({ adminInfo, handleFormEditing 
           </CardActions>
         </Card>
       </Grid>
-      { adminInfo.isSuperAdmin && <Grid item lg={12} md={12} xs={12}>
+      { adminInfo.role === 'super_admin' && <Grid item lg={12} md={12} xs={12}>
         <Typography mb={2} variant="h5">Elenco Agenzie</Typography>
-        <AgencyTable agencies={agencies} />
+        <AgencyTable
+          adminInfo={adminInfo}
+          agencies={agencies}
+        />
       </Grid> }
     </Grid>
   );

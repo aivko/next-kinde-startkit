@@ -6,13 +6,17 @@ export async function postCustomerHandler({ req }: { req: any }) {
   return await createCustomerDb(req);
 }
 
-export async function getCustomerHandler({ id, customerId }: { id: any, customerId: any }) {
-  return await fetchCustomerDb({ id, customerId });
+export async function postGetAllCustomersHandler({ req }: { req: any }) {
+  return await postGetAllCustomers(req);
 }
 
-export async function getAllCustomerHandler({ id }: { id: any }) {
-  return await fetchAllCustomerDb({ id });
+export async function getCustomerHandler({ req }: { req: any }) {
+  return await fetchCustomerDb(req);
 }
+
+// export async function getAllCustomerHandler({ id }: { id: any }) {
+//   return await fetchAllCustomerDb({ id });
+// }
 
 export async function patchCustomerHandler({ data, id }: { data: any, id: any }) {
   return await updateCustomerDb(data, id);
@@ -71,22 +75,32 @@ async function updateCustomerDb(data: any, id: any) {
   }
 }
 
-async function fetchAllCustomerDb({ id }: { id:string }) {
+// async function fetchAllCustomerDb({ id }: { id:string }) {
+//   try {
+//     return await prisma.customer.findMany({
+//       where: { agencyId: id },
+//     });
+//   } catch (error) {
+//     throw error;
+//   }
+// }
+
+export async function postGetAllCustomers(payload: any) {
   try {
     return await prisma.customer.findMany({
-      where: { agencyId: id },
+      where: { agencyId: payload.id },
     });
   } catch (error) {
     throw error;
   }
 }
 
-async function fetchCustomerDb({ id, customerId }: { id:string, customerId:string }) {
+async function fetchCustomerDb({ agencyId, id }: { agencyId:string, id:string }) {
   try {
     return await prisma.customer.findUnique({
       where: {
-        agencyId: id,
-        id: customerId
+        agencyId,
+        id
       },
     });
   } catch (error) {

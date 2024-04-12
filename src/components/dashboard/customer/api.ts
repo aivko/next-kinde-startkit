@@ -6,7 +6,6 @@ interface RequestOptions {
 
 const handleResponse = async (response: Response) => {
   if (!response.ok) {
-    console.log(response);
     throw new Error(`Failed to send data to backend, ${response}`);
   }
   return await response.json();
@@ -38,6 +37,15 @@ export const createCustomer = async (payload: any) => {
   });
 };
 
+export const fetchAllCustomer = async (payload: any) => {
+  payload.mode = 'all';
+  return sendRequest({
+    method: "POST",
+    payload,
+    uri: "/api/customer"
+  });
+};
+
 export const updateCustomer = async (payload: any) => {
   return sendRequest({
     method: "PATCH",
@@ -46,17 +54,12 @@ export const updateCustomer = async (payload: any) => {
   });
 };
 
-export const fetchCustomer = async (id: string) => {
+export const fetchCustomer = async (payload: any) => {
+  payload.mode = 'single';
   return sendRequest({
-    method: "GET",
-    uri: `/api/customer?id${id}`,
-  });
-};
-
-export const fetchAllCustomer = async () => {
-  return sendRequest({
-    method: "GET",
-    uri: "/api/customer?all"
+    method: "POST",
+    payload,
+    uri: '/api/customer',
   });
 };
 
