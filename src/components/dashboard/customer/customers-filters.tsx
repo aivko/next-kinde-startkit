@@ -5,12 +5,10 @@ import Card from '@mui/material/Card';
 import Button from '@mui/material/Button';
 import InputAdornment from '@mui/material/InputAdornment';
 import OutlinedInput from '@mui/material/OutlinedInput';
-import SearchBar from "material-ui-search-bar";
-import { CustomersForm } from '@/components/dashboard/customer/customers-form';
 import { useCustomerContext } from "@/components/dashboard/customer/customers-layout";
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
-import { CREATING } from "@/components/dashboard/customer/constants";
+import { ClientForm } from "@/components/dashboard/shared/ClientForm";
 
 
 export function CustomersFilters() {
@@ -22,6 +20,14 @@ export function CustomersFilters() {
   const handleClick = () => {
     setCustomerContext({})
     setModalOpenContext(true);
+  };
+
+  const handleCustomers = async (value) => {
+    console.log(value)
+  };
+
+  const handleModal = async (value:boolean) => {
+    setModalOpenContext(value);
   };
 
   return (
@@ -48,8 +54,12 @@ export function CustomersFilters() {
         </Button>
       </Card>
       {
-        isModalOpenContext && <CustomersForm
-          customer={{}}
+        isModalOpenContext && <ClientForm
+          customer={{  }}
+          customers={[]}
+          isModalOpen={isModalOpenContext}
+          setCustomers={handleCustomers}
+          setModalOpen={handleModal}
         />
       }
     </React.Fragment>

@@ -37,28 +37,45 @@ export interface FormData {
   electricitySelected: boolean;
   gasSelected: boolean;
   fibreSelected: boolean;
+  pod: string;
+  pgr: string;
+  pod_transfer: string;
+  pdr_transfer: string;
 }
 
 export const validationSchema = Yup.object().shape({
-  email: Yup.string().email().required('Email is required'),
-  vat: Yup.string().required('Office province is required'),
-  iban: Yup.string().required('Office province is required'),
-  firstName: Yup.string().required('First name is required'),
-  companyName: Yup.string().required('Company name is required'),
-  operationAddress: Yup.string().notRequired(),
-  operationPostCode: Yup.string().notRequired(),
-  operationProvince: Yup.string().notRequired(),
-  operationCity: Yup.string().notRequired(),
-  officeAddress: Yup.string().required('Registered office address is required'),
-  officePostCode: Yup.string().required('Office post code is required'),
-  officeCity: Yup.string().required('Office city is required'),
-  officeProvince: Yup.string().required('Office province is required'),
-  phoneNumber: Yup.string().matches(phoneRegExp, 'Phone number is not valid').required('Phone number is required'),
-  mobileNumber: Yup.string().matches(phoneRegExp, 'Phone number is not valid').required('Phone number is required'),
+  email: Yup.string().email().required('L\'e-mail è obbligatoria'),
+  vat: Yup.string().required('E\' richiesta l\'IVA'),
+  iban: Yup.string().required('È richiesto l\'IBAN'),
+  firstName: Yup.string().required('Il nome del proprietario è obbligatorio'),
+  companyName: Yup.string().required('Nome azienda/Cognome è obbligatorio'),
+  operationAddress: Yup.string().required('È obbligatorio l\'indirizzo di fornitura completo di numero civico'),
+  operationPostCode: Yup.string().required('È richiesto il codice postale'),
+  operationProvince: Yup.string().required('La provincia è obbligatoria'),
+  operationCity: Yup.string().required('La città è obbligatoria'),
+  officeAddress: Yup.string().required('L\'indirizzo della sede legale è obbligatorio'),
+  officePostCode: Yup.string().required('È richiesto il codice postale dell\'ufficio'),
+  officeCity: Yup.string().required('La città dell\'ufficio è obbligatoria'),
+  officeProvince: Yup.string().required('La provincia dell\'ufficio è obbligatoria'),
+  mobileNumber: Yup.string().matches(phoneRegExp, 'Il numero di telefono non è valido').required('Il numero di telefono è obbligatorio'),
+  pod_transfer: Yup.string(),
+  pdr_transfer: Yup.string(),
   notes: Yup.string().notRequired(),
-  electricitySelected: Yup.boolean().notRequired(),
-  gasSelected: Yup.boolean().notRequired(),
-  fibreSelected: Yup.boolean().notRequired(),
+  gasSelected: Yup.boolean(),
+  fibreSelected: Yup.boolean(),
+  electricitySelected: Yup.boolean().when(['gasSelected', 'fibreSelected'], ([], schema, values) => {
+    const { gasSelected, fibreSelected } = values.parent;
+    if (!values.value ||  !gasSelected && !fibreSelected) { return schema.required('Il servizio clienti è obbligatorio'); }
+    return schema;
+  }),
+  pod: Yup.string().when('electricitySelected', (electricitySelected, schema) => {
+    if (electricitySelected[0] === true) { return schema.required('Il campo è obbligatiorio'); }
+    return schema;
+  }),
+  pdr: Yup.string().when('gasSelected', (gasSelected, schema) => {
+    if (gasSelected[0] === true) { return schema.required('Il campo è obbligatiorio'); }
+    return schema;
+  }),
 });
 
 export const hiddenInputStyles = {

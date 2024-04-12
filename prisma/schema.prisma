@@ -35,7 +35,7 @@ model Admins {
   notes               String   @default("")
   isVerified          Boolean  @default(false)
   isVerifiedBySA      Boolean  @default(false)
-  isSuperAdmin        Boolean  @default(false)
+  role                String   @default("")
 }
 
 model Customer {
@@ -62,4 +62,10 @@ model Customer {
   gasSelected         Boolean  @default(false)
   fibreSelected       Boolean  @default(false)
   files               Json
+  pdr                 String   @default("")
+  pod                 String   @default("")
+  pod_transfer        String   @default("")
+  pdr_transfer        String   @default("")
+  pod_status          String   @default("")
+  pdr_status          String   @default("")
 }
