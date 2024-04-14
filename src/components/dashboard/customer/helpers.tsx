@@ -63,12 +63,12 @@ export const validationSchema = Yup.object().shape({
   notes: Yup.string().notRequired(),
   gasSelected: Yup.boolean(),
   fibreSelected: Yup.boolean(),
-  electricitySelected: Yup.boolean().when([], ([], schema, values) => {
+  electricitySelected: Yup.boolean().when(['gasSelected', 'fibreSelected'], ([], schema, values) => {
     const { gasSelected, fibreSelected } = values.parent;
-    if (!values.value || !gasSelected || !fibreSelected) {
-      return schema.required('Il servizio clienti è obbligatorio');
+    if (values.value || gasSelected || fibreSelected) {
+      return schema;
     }
-    return schema;
+    return schema.required('Il servizio clienti è obbligatorio');
   }),
   pod: Yup.string().when('electricitySelected', (electricitySelected, schema) => {
     if (electricitySelected[0] === true) { return schema.required('Il campo è obbligatiorio'); }

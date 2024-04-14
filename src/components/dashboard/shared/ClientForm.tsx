@@ -124,11 +124,11 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
   };
 
   const onSubmit = async (data: FormData) => {
-    setLoadingButton(true);
     if (addedFiles?.length < 1) {
       setAddedFilesError(true);
       return false;
     } else {
+      setLoadingButton(true);
       data['files'] = addedFiles;
       data['pod_status'] = podStatus;
       data['pdr_status'] = pdrStatus;
@@ -455,10 +455,10 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
                               {...register('electricitySelected')}
                               render={({ field: { onChange, onBlur, value } }) => (
                                 <Checkbox
-                                  id="electricitySelected"
+                                  // id="electricitySelected"
                                   onChange={onChange}
                                   onBlur={onBlur}
-                                  checked={value}
+                                  checked={!!value}
                                 />
                               )}
                             />}
@@ -562,7 +562,7 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
                                   id="gasSelected"
                                   onChange={onChange}
                                   onBlur={onBlur}
-                                  checked={value}
+                                  checked={!!value}
                                 />
                               )}
                             />}
@@ -656,7 +656,7 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
                             <Checkbox
                               id="fibreSelected"
                               onBlur={onBlur}
-                              checked={value}
+                              checked={!!value}
                               onChange={onChange}
                             />
                           )}

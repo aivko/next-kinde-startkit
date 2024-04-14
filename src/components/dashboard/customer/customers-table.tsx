@@ -113,7 +113,7 @@ export function CustomersTable() {
                 <TableCell>{row.phoneNumber}</TableCell>
                 <TableCell>
                   {
-                    row?.pod_status && <Chip
+                    row?.pod_status && row?.pod && <Chip
                       size="small"
                       sx={{ minWidth: '100px' }}
                       label={setStatusLabel(row?.pod_status)}
@@ -124,7 +124,7 @@ export function CustomersTable() {
                 </TableCell>
                 <TableCell>
                   {
-                    row?.pdr_status && <Chip
+                    row?.pdr_status && row?.pdr && <Chip
                       size="small"
                       sx={{ minWidth: '100px' }}
                       label={setStatusLabel(row?.pdr_status)}

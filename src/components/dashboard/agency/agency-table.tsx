@@ -178,7 +178,7 @@ export default function AgencyTable({ agencies, adminInfo }) {
                             </TableCell>
                             <TableCell>
                               {
-                                customer?.pod_status && <Chip
+                                customer?.pod_status && customer?.pod && <Chip
                                   size="small"
                                   sx={{ minWidth: '100px' }}
                                   label={setStatusLabel(customer?.pod_status)}
@@ -188,7 +188,7 @@ export default function AgencyTable({ agencies, adminInfo }) {
                             </TableCell>
                             <TableCell>
                               {
-                                customer?.pdr_status && <Chip
+                                customer?.pdr_status && customer?.pdr && <Chip
                                   size="small"
                                   sx={{ minWidth: '100px' }}
                                   label={setStatusLabel(customer?.pdr_status)}
