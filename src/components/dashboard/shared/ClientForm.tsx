@@ -23,25 +23,29 @@ import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from '@mui/icons-material/Close';
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import AssignmentIcon from "@mui/icons-material/Assignment";
 import CircularProgress from "@mui/material/CircularProgress";
 import Chip from "@mui/material/Chip";
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
+import Avatar from '@mui/material/Avatar';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 import DeleteIcon from "@mui/icons-material/Delete";
 import ImageKit from "imagekit";
 import { IKContext, IKUpload } from "imagekitio-react";
+import { setStatusIconsColors } from "@/app/dashboard/helpers";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 export function ClientForm({ customer= {}, isModalOpen = false, customers = [], setCustomers, setModalOpen, role = '' }) {
   const [addedFiles, setAddedFiles] = useState<Array<any>>([]);
   const [addedFilesError, setAddedFilesError] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-  const [fibreSelected, setFibreSelected] = useState<boolean>(false);
-  const [podStatus, setPodStatus] = useState<string>('');
-  const [pdrStatus, setPdrStatus] = useState<string>('');
+  const [podStatus, setPodStatus] = useState<string>('submitted');
+  const [pdrStatus, setPdrStatus] = useState<string>('submitted');
+  const [isLoadingButton, setLoadingButton] = React.useState<boolean | false>(false);
 
   const authenticator =  async () => {
     try {
@@ -90,6 +94,8 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
       setValue('pod', customer.pod);
       setValue('pod_transfer', customer.pod_transfer);
       setValue('pdr_transfer', customer.pdr_transfer);
+      setPodStatus(customer.pod_status);
+      setPdrStatus(customer.pdr_status);
       setAddedFiles(customer.files);
     }
   }, [customer]);
@@ -100,10 +106,6 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
   });
   const handleClose = () => {
     setModalOpen(false);
-  };
-
-  const handleChange = () => {
-    console.log('sdvsdvsdv')
   };
 
   const handleChangeSelectPOD = (event: SelectChangeEvent) => {
@@ -122,7 +124,7 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
   };
 
   const onSubmit = async (data: FormData) => {
-    console.log(data)
+    setLoadingButton(true);
     if (addedFiles?.length < 1) {
       setAddedFilesError(true);
       return false;
@@ -136,11 +138,13 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
         updateCustomer(result).then(res => {
           const updatedCustomers = customers.filter(customer => customer.id !== res.data.id);
           setCustomers([res.data, ...updatedCustomers]);
+          setLoadingButton(false);
           handleClose();
         })
       } else {
         createCustomer(data).then(res => {
           setCustomers([res.data, ...customers]);
+          setLoadingButton(false);
           handleClose();
         })
       }
@@ -437,7 +441,7 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
                         sx={{
                           display: 'flex',
                           flexDirection: 'row',
-                          alignItems:'center'
+                          alignItems:'center',
                         }}
                       >
                         <Grid item>
@@ -451,9 +455,10 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
                               {...register('electricitySelected')}
                               render={({ field: { onChange, onBlur, value } }) => (
                                 <Checkbox
+                                  id="electricitySelected"
                                   onChange={onChange}
                                   onBlur={onBlur}
-                                  checked={!!value}
+                                  checked={value}
                                 />
                               )}
                             />}
@@ -499,20 +504,26 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
                             size="small"
                             disabled={role !== 'super_admin'}
                           >
-                            <InputLabel
-                              id="demo-select-small-label"
-                            >Stato del cliente</InputLabel>
+                            <InputLabel id="demo-select-small-label">Stato del contratto</InputLabel>
                             <Select
                               labelId="demo-select-small-label"
                               id="light-select"
-                              value={podStatus}
+                              label="Stato del contratto"
+                              value={podStatus || 'submitted'}
                               onChange={handleChangeSelectPOD}
                             >
-                              <MenuItem value="progress">In corso</MenuItem>
-                              <MenuItem value="done">Fatta</MenuItem>
-                              <MenuItem value="disabled">Disabilitata</MenuItem>
+                              <MenuItem selected={true} value="submitted">Inviato</MenuItem>
+                              <MenuItem value="progress">In lavorazione</MenuItem>
+                              <MenuItem value="accepted">Accettata</MenuItem>
+                              <MenuItem value="rejected">Rifiutata</MenuItem>
+                              <MenuItem value="activate">Attiva</MenuItem>
                             </Select>
                           </FormControl>
+                        </Grid>
+                        <Grid item>
+                          <Avatar sx={{ backgroundColor: setStatusIconsColors(podStatus) }} variant="rounded">
+                            <AssignmentIcon />
+                          </Avatar>
                         </Grid>
                       </Grid>
                     </Box>
@@ -548,6 +559,7 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
                               {...register('gasSelected')}
                               render={({ field: { onChange, onBlur, value } }) => (
                                 <Checkbox
+                                  id="gasSelected"
                                   onChange={onChange}
                                   onBlur={onBlur}
                                   checked={value}
@@ -598,19 +610,27 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
                           >
                             <InputLabel
                               id="demo-select-small-label">
-                              Stato del cliente
+                              Stato del contratto
                             </InputLabel>
                             <Select
                               labelId="demo-select-small-label"
+                              label="Stato del contratto"
                               id="gas-select"
-                              value={pdrStatus}
+                              value={pdrStatus || 'submitted'}
                               onChange={handleChangeSelectPDR}
                             >
-                              <MenuItem value="progress">In corso</MenuItem>
-                              <MenuItem value="done">Fatta</MenuItem>
-                              <MenuItem value="disabled">Disabilitata</MenuItem>
+                              <MenuItem selected={true} value="submitted">Inviato</MenuItem>
+                              <MenuItem value="progress">In lavorazione</MenuItem>
+                              <MenuItem value="accepted">Accettata</MenuItem>
+                              <MenuItem value="rejected">Rifiutata</MenuItem>
+                              <MenuItem value="activate">Attiva</MenuItem>
                             </Select>
                           </FormControl>
+                        </Grid>
+                        <Grid item>
+                          <Avatar sx={{ backgroundColor: setStatusIconsColors(pdrStatus) }} variant="rounded">
+                            <AssignmentIcon />
+                          </Avatar>
                         </Grid>
                       </Grid>
                     </Box>
@@ -634,18 +654,15 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
                           {...register('fibreSelected')}
                           render={({ field: { onChange, onBlur, value } }) => (
                             <Checkbox
+                              id="fibreSelected"
                               onBlur={onBlur}
-                              checked={!!value}
-                              onChange={(e) => {
-                                onChange(e.target.checked);
-                                handleChange(e.target.checked);
-                              }}
+                              checked={value}
+                              onChange={onChange}
                             />
                           )}
                         />}
                       />
                     </Box>
-
                     {errors?.electricitySelected &&  <Typography variant="body2" gutterBottom style={errorText}>{ errors.electricitySelected.message }</Typography>}
                   </Grid>
                   <Grid item sx={{ position: 'relative' }}>
@@ -732,13 +749,14 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
             >
               Annulla
             </Button>
-            <Button
+            <LoadingButton
+              loading={isLoadingButton}
               size="medium"
               type="submit"
               variant="contained"
             >
               Invia
-            </Button>
+            </LoadingButton>
           </CardActions>
         </Card>
       </form>

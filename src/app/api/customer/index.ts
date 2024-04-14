@@ -95,12 +95,12 @@ export async function postGetAllCustomers(payload: any) {
   }
 }
 
-async function fetchCustomerDb({ agencyId, id }: { agencyId:string, id:string }) {
+async function fetchCustomerDb({ agencyId, customerId }: { agencyId:string, customerId:string }) {
   try {
     return await prisma.customer.findUnique({
       where: {
         agencyId,
-        id
+        id: customerId
       },
     });
   } catch (error) {
