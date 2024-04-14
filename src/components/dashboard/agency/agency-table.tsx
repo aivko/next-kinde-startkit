@@ -13,6 +13,7 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Button from '@mui/material/Button';
+import LoadingButton from '@mui/lab/LoadingButton';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
@@ -22,9 +23,10 @@ import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import { ClientForm } from "@/components/dashboard/shared/ClientForm";
+import { setStatusLabel, setStatusColors } from "@/app/dashboard/helpers";
 
 interface Column {
-  id: 'name' | 'email' | 'iban' | 'companyName' | 'action';
+  id: 'name' | 'email' | 'pod' | 'companyName' | 'action' | 'pdr';
   label: string;
   minWidth?: number;
 }
@@ -33,7 +35,8 @@ const columns: readonly Column[] = [
   { id: 'companyName', label: 'Nome della ditta' },
   { id: 'name', label: 'Nome' },
   { id: 'email', label: 'Email' },
-  { id: 'iban', label: 'IBAN' },
+  { id: 'pod', label: 'Stato POD' },
+  { id: 'pdr', label: 'Stato PRD' },
   { id: 'action', label: 'Azione' },
 ];
 
@@ -42,6 +45,7 @@ export default function AgencyTable({ agencies, adminInfo }) {
   const [expanded, setExpanded] = React.useState<string | false>(false);
   const [customer, setCustomer] = React.useState<{}>({});
   const [customers, setCustomers] = React.useState<[]>([]);
+  const [isLoading, setLoading] = React.useState<boolean | false>(false);
 
   const handleChange = (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
     setCustomers([]);
@@ -49,7 +53,13 @@ export default function AgencyTable({ agencies, adminInfo }) {
   };
 
   const handleViewClients = (id: string) => {
-    fetchAllCustomer({ id }).then(res => setCustomers(res.data))
+    setLoading(true);
+    fetchAllCustomer({ id })
+      .then(res => {
+        setCustomers(res.data);
+      }).finally(() => {
+        setLoading(false);
+    })
   }
 
   const handleModal = (val:boolean) => {
@@ -127,12 +137,13 @@ export default function AgencyTable({ agencies, adminInfo }) {
                   </Typography>
                 </CardContent>
                 <CardActions>
-                  <Button
-                    variant="outlined"
+                  <LoadingButton
                     onClick={() => handleViewClients(agency.id)}
+                    loading={isLoading}
+                    variant="outlined"
                   >
-                    Visualizza i clienti dell'agenzia
-                  </Button>
+                    <span>Visualizza i clienti dell'agenzia</span>
+                  </LoadingButton>
                 </CardActions>
               </Card>
             </AccordionDetails>
@@ -166,7 +177,24 @@ export default function AgencyTable({ agencies, adminInfo }) {
                               { customer.email }
                             </TableCell>
                             <TableCell>
-                              { customer.iban }
+                              {
+                                customer?.pod_status && <Chip
+                                  size="small"
+                                  sx={{ minWidth: '100px' }}
+                                  label={setStatusLabel(customer?.pod_status)}
+                                  color={setStatusColors(customer?.pod_status)}
+                                />
+                              }
+                            </TableCell>
+                            <TableCell>
+                              {
+                                customer?.pdr_status && <Chip
+                                  size="small"
+                                  sx={{ minWidth: '100px' }}
+                                  label={setStatusLabel(customer?.pdr_status)}
+                                  color={setStatusColors(customer?.pdr_status)}
+                                />
+                              }
                             </TableCell>
                             <TableCell>
                               <IconButton

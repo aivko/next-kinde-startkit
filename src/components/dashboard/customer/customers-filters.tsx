@@ -32,19 +32,19 @@ export function CustomersFilters() {
 
   return (
     <React.Fragment>
-      <Card sx={{ p: 2, justifyContent: 'space-between', display: 'flex' }}>
-        <OutlinedInput
-          size="small"
-          defaultValue=""
-          fullWidth
-          placeholder="Cerca cliente"
-          startAdornment={
-            <InputAdornment position="start">
-              <SearchIcon />
-            </InputAdornment>
-          }
-          sx={{ maxWidth: '500px' }}
-        />
+      <Card sx={{ p: 2, justifyContent: 'flex-end', display: 'flex' }}>
+        {/*<OutlinedInput*/}
+        {/*  size="small"*/}
+        {/*  defaultValue=""*/}
+        {/*  fullWidth*/}
+        {/*  placeholder="Cerca cliente"*/}
+        {/*  startAdornment={*/}
+        {/*    <InputAdornment position="start">*/}
+        {/*      <SearchIcon />*/}
+        {/*    </InputAdornment>*/}
+        {/*  }*/}
+        {/*  sx={{ maxWidth: '500px' }}*/}
+        {/*/>*/}
         <Button
           startIcon={<AddIcon />}
           onClick={handleClick}

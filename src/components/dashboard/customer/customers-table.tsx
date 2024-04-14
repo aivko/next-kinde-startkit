@@ -10,7 +10,7 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
-import Switch from '@mui/material/Switch';
+import Chip from '@mui/material/Chip';
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
@@ -20,10 +20,12 @@ import { ClientForm } from "@/components/dashboard/shared/ClientForm";
 import { useCustomerContext } from "@/components/dashboard/customer/customers-layout";
 import CircularIndeterminate from '@/components/dashboard/shared/CircularIndeterminate';
 import { fetchAdmin } from "@/components/dashboard/agency/api";
+import { setStatusLabel, setStatusColors } from "@/app/dashboard/helpers";
 
 export function CustomersTable() {
   const [isLoading, setLoading] = useState<boolean>(true);
   const [agencyId, setAgencyId] = useState<string>('');
+  const [role, setRole] = useState<string>('');
 
   const {
     isModalOpenContext,
@@ -36,31 +38,24 @@ export function CustomersTable() {
 
   useEffect(() => {
     fetchAdmin().then(res => {
-      const { id } = res.data;
+      const { id, role } = res.data;
+      console.log(role)
+      setRole(role)
       setAgencyId(id);
       fetchAllCustomer({ id })
         .then(res => {
           // show last added customers first
           const customersList = res.data || [];
           setCustomersContext(customersList.reverse());
-      })
-        .then(() => {
+        })
+        .catch(() => {
           setLoading(false);
-        });
+        }).finally(() => {
+          setLoading(false);
+      });
     })
 
   }, []);
-
-  const handleChangeStatus = (id:string) => {
-    const array = customersContext.map(customer => {
-      if (customer.id === id) {
-        return { ...customer, isActive: !customer.isActive };
-      }
-      return customer;
-    })
-
-    setCustomersContext(array)
-  };
 
   const handleEdit = async (id: string) => {
     const customer = await fetchCustomer({
@@ -102,7 +97,8 @@ export function CustomersTable() {
               <TableCell>Nome della ditta</TableCell>
               <TableCell>Email</TableCell>
               <TableCell>Telefono</TableCell>
-              <TableCell>Stato</TableCell>
+              <TableCell>Stato POD</TableCell>
+              <TableCell>Stato PRD</TableCell>
               <TableCell>Azioni</TableCell>
             </TableRow>
           </TableHead>
@@ -116,11 +112,25 @@ export function CustomersTable() {
                 <TableCell>{row.email}</TableCell>
                 <TableCell>{row.phoneNumber}</TableCell>
                 <TableCell>
-                  <Switch
-                    checked={row.isActive}
-                    onChange={() => handleChangeStatus(row.id)}
-                    inputProps={{ 'aria-label': 'controlled' }}
-                  />
+                  {
+                    row?.pod_status && <Chip
+                      size="small"
+                      sx={{ minWidth: '100px' }}
+                      label={setStatusLabel(row?.pod_status)}
+                      color={setStatusColors(row?.pod_status)}
+                    />
+                  }
+
+                </TableCell>
+                <TableCell>
+                  {
+                    row?.pdr_status && <Chip
+                      size="small"
+                      sx={{ minWidth: '100px' }}
+                      label={setStatusLabel(row?.pdr_status)}
+                      color={setStatusColors(row?.pdr_status)}
+                    />
+                  }
                 </TableCell>
                 <TableCell>
                   <IconButton
@@ -147,6 +157,7 @@ export function CustomersTable() {
       <Divider />
       {
         isModalOpenContext && <ClientForm
+          role={role}
           customer={customerContext}
           customers={customersContext}
           isModalOpen={isModalOpenContext}
