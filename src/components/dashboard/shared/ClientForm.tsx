@@ -16,7 +16,7 @@ import Button from "@mui/material/Button";
 import { useForm, Controller } from "react-hook-form";
 import { FormData, Transition, validationSchema, mergeObjects, hiddenInputStyles, errorText } from "@/components/dashboard/customer/helpers";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { createCustomer, updateCustomer } from "@/components/dashboard/customer/api";
+import { createCustomer, removeCustomer, updateCustomer } from "@/components/dashboard/customer/api";
 import Dialog from "@mui/material/Dialog";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -38,6 +38,19 @@ import ImageKit from "imagekit";
 import { IKContext, IKUpload } from "imagekitio-react";
 import { setStatusIconsColors } from "@/app/dashboard/helpers";
 import LoadingButton from "@mui/lab/LoadingButton";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogActions from "@mui/material/DialogActions";
+
+const inputStyles = {
+  "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button": {
+    display: "none",
+  },
+  "& input[type=number]": {
+    MozAppearance: "textfield",
+  },
+};
 
 export function ClientForm({ customer= {}, isModalOpen = false, customers = [], setCustomers, setModalOpen, role = '' }) {
   const [addedFiles, setAddedFiles] = useState<Array<any>>([]);
@@ -45,7 +58,10 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
   const [loading, setLoading] = useState<boolean>(false);
   const [podStatus, setPodStatus] = useState<string>('submitted');
   const [pdrStatus, setPdrStatus] = useState<string>('submitted');
+  const [fibraStatus, setFibraStatus] = useState<string>('submitted');
   const [isLoadingButton, setLoadingButton] = React.useState<boolean | false>(false);
+  const [imageId, setImageId] = useState<string>('');
+  const [isDialogOpen, setDialogOpen] = useState<boolean>(false);
 
   const authenticator =  async () => {
     try {
@@ -94,8 +110,10 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
       setValue('pod', customer.pod);
       setValue('pod_transfer', customer.pod_transfer);
       setValue('pdr_transfer', customer.pdr_transfer);
+      setValue('fibra_transfer', customer.fibra_transfer);
       setPodStatus(customer.pod_status);
       setPdrStatus(customer.pdr_status);
+      setFibraStatus(customer.fibra_status);
       setAddedFiles(customer.files);
     }
   }, [customer]);
@@ -116,6 +134,10 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
     setPdrStatus(event.target.value);
   };
 
+  const handleChangeFibraPDR = (event: SelectChangeEvent) => {
+    setFibraStatus(event.target.value);
+  };
+
   const onError = (error) => {
     console.log(error)
     if (addedFiles?.length < 1) {
@@ -132,6 +154,7 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
       data['files'] = addedFiles;
       data['pod_status'] = podStatus;
       data['pdr_status'] = pdrStatus;
+      data['fibra_status'] = fibraStatus;
 
       if (customer?.id) {
         const result = mergeObjects(customer, data);
@@ -168,14 +191,26 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
     ])
   };
 
-  const handleDelete = async ({ id, name }) => {
-    const updatedFiles = addedFiles.filter(file => file.id !== id);
-    setAddedFiles(updatedFiles)
-  };
-
   const handleClick = async ({ id, name }) => {
     const url = `https://ik.imagekit.io/gjo0mtzlyq/${name}`
     window.open(url)
+  };
+
+  const handleDialogClose = () => {
+    setDialogOpen(false);
+  };
+
+  const handleDelete = () => {
+    const updatedFiles = addedFiles.filter(file => file.id !== imageId);
+    setAddedFiles(updatedFiles);
+    setImageId('')
+    handleDialogClose();
+  };
+
+  const handleDeleteImage = async ({ id }) => {
+    setImageId(id)
+    setDialogOpen(true);
+
   };
 
   return (
@@ -258,7 +293,7 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
                       <TextField
                         error={Boolean(errors.iban)}
                         id="outlined-error-helper-text"
-                        label="IBAN (Accredito bollete) *"
+                        label="IBAN (Accredito bollette) *"
                         helperText={errors?.iban?.message}
                         variant="outlined"
                         {...register('iban')}
@@ -395,9 +430,11 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
                   <Grid item xs={6} md={3}>
                     <FormControl fullWidth required>
                       <TextField
+                        sx={inputStyles}
+                        type="number"
                         error={Boolean(errors.mobileNumber)}
                         id="outlined-error-helper-text"
-                        label="Cellufare *"
+                        label="Cellulare *"
                         helperText={errors?.mobileNumber?.message}
                         variant="outlined"
                         {...register('mobileNumber')}
@@ -409,9 +446,13 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
                   <Grid item xs={6} md={3}>
                     <FormControl fullWidth>
                       <TextField
+                        sx={inputStyles}
+                        type="number"
                         id="outlined-error-helper-text"
                         label="Telefono"
                         variant="outlined"
+                        error={Boolean(errors.phoneNumber)}
+                        helperText={errors?.phoneNumber?.message}
                         {...register('phoneNumber')}
                         InputLabelProps={{ shrink: true }}
                         size="small"
@@ -468,6 +509,8 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
                         <Grid item xs={4} md={4}>
                           <FormControl fullWidth required>
                             <TextField
+                              sx={inputStyles}
+                              type="number"
                               error={Boolean(errors.pod)}
                               helperText={errors?.pod?.message}
                               label="POD *"
@@ -572,6 +615,8 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
                         <Grid item xs={4} md={4}>
                           <FormControl fullWidth required>
                             <TextField
+                              sx={inputStyles}
+                              type="number"
                               error={Boolean(errors.pdr)}
                               helperText={errors?.pdr?.message}
                               label="PDR *"
@@ -644,24 +689,95 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
                         border: '1px solid grey'
                       }}
                     >
-                      <FormControlLabel
-                        labelPlacement="bottom"
-                        label="Fibra"
-                        control={<Controller
-                          control={control}
-                          name="fibreSelected"
-                          defaultValue={false}
-                          {...register('fibreSelected')}
-                          render={({ field: { onChange, onBlur, value } }) => (
-                            <Checkbox
-                              id="fibreSelected"
-                              onBlur={onBlur}
-                              checked={!!value}
-                              onChange={onChange}
+                      <Grid
+                        container
+                        spacing={3}
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          alignItems:'center'
+                        }}
+                      >
+                        <Grid item>
+                          <FormControlLabel
+                            labelPlacement="bottom"
+                            label="Fibra"
+                            control={<Controller
+                              control={control}
+                              name="fibreSelected"
+                              defaultValue={false}
+                              {...register('fibreSelected')}
+                              render={({ field: { onChange, onBlur, value } }) => (
+                                <Checkbox
+                                  id="fibreSelected"
+                                  onBlur={onBlur}
+                                  checked={!!value}
+                                  onChange={onChange}
+                                />
+                              )}
+                            />}
+                          />
+                        </Grid>
+
+                        <Grid item xs={4} md={4}></Grid>
+                        <Grid item>
+                          <RadioGroup
+                            row
+                            name="pdr-radio-buttons-group"
+                            defaultValue={customer?.fibra_transfer || "fibra_mnp"}
+                          >
+                            <FormControlLabel
+                              value="fibra_mnp"
+                              label="MNP"
+                              sx={{
+                                minWidth: '94px'
+                              }}
+                              {...register('fibra_transfer')}
+                              control={<Radio />}
                             />
-                          )}
-                        />}
-                      />
+                            <FormControlLabel
+                              value="fibra_nuova"
+                              label="Nuova numero"
+                              sx={{
+                                minWidth: '171px'
+                              }}
+                              {...register('fibra_transfer')}
+                              control={<Radio />}
+                            />
+                          </RadioGroup>
+                        </Grid>
+
+                        <Grid item>
+                          <FormControl
+                            sx={{ m: 1, minWidth: 180 }}
+                            size="small"
+                            disabled={role !== 'super_admin'}
+                          >
+                            <InputLabel
+                              id="demo-select-small-label">
+                              Stato del contratto
+                            </InputLabel>
+                            <Select
+                              labelId="demo-select-small-label"
+                              label="Stato del contratto"
+                              id="fibra-select"
+                              value={fibraStatus || 'submitted'}
+                              onChange={handleChangeFibraPDR}
+                            >
+                              <MenuItem selected={true} value="submitted">Inviato</MenuItem>
+                              <MenuItem value="progress">In lavorazione</MenuItem>
+                              <MenuItem value="accepted">Accettata</MenuItem>
+                              <MenuItem value="rejected">Rifiutata</MenuItem>
+                              <MenuItem value="activate">Attiva</MenuItem>
+                            </Select>
+                          </FormControl>
+                        </Grid>
+                        <Grid item>
+                          <Avatar sx={{ backgroundColor: setStatusIconsColors(fibraStatus) }} variant="rounded">
+                            <AssignmentIcon />
+                          </Avatar>
+                        </Grid>
+                      </Grid>
                     </Box>
                     {errors?.electricitySelected &&  <Typography variant="body2" gutterBottom style={errorText}>{ errors.electricitySelected.message }</Typography>}
                   </Grid>
@@ -675,7 +791,7 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
                       startIcon={<CloudUploadIcon />}
                       onClick={() => setAddedFilesError(false)}
                     >
-                      Caricare files
+                      Caricare file
                       <IKContext
                         publicKey="public_3KePOhstCduL+PbBlMhQP3xbLyw="
                         urlEndpoint="https://ik.imagekit.io/gjo0mtzlyq"
@@ -712,12 +828,15 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
                   <Grid item xs={12} md={12}>
                     {
                       addedFiles?.length > 0 && addedFiles.map(file => <Chip
+                        sx={{
+                          marginRight: 1
+                        }}
                         key={file.id}
                         label={file.name}
                         color="primary"
                         variant="outlined"
                         onClick={() => handleClick(file)}
-                        onDelete={() => handleDelete(file)}
+                        onDelete={() => handleDeleteImage(file)}
                         deleteIcon={<DeleteIcon />}
                       />)
                     }
@@ -759,6 +878,48 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
             </LoadingButton>
           </CardActions>
         </Card>
+        <Dialog
+          open={isDialogOpen}
+          onClose={handleDialogClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+          TransitionComponent={Transition}
+          keepMounted
+        >
+          <DialogTitle id="alert-dialog-title">
+            Sei sicuro di cancellare il file?
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              Questa finestra di dialogo modale ti chiede di confermare la tua decisione di eliminare un'immagine. Facendo clic su "Cancellare", procederai con il processo di eliminazione.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              startIcon={<DeleteIcon />}
+              color="error"
+              variant="contained"
+              size="medium"
+              onClick={handleDelete}
+              autoFocus
+              sx={{
+                minWidth: '100px'
+              }}
+            >
+              Cancellare</Button>
+            <Button
+              color="info"
+              variant="contained"
+              size="medium"
+              onClick={handleDialogClose}
+              sx={{
+                minWidth: '100px'
+              }}
+            >
+              Annulla
+            </Button>
+          </DialogActions>
+        </Dialog>
       </form>
     </Dialog>
   );

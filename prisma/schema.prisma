@@ -68,4 +68,6 @@ model Customer {
   pdr_transfer        String   @default("")
   pod_status          String   @default("")
   pdr_status          String   @default("")
+  fibra_status        String   @default("")
+  fibra_transfer      String   @default("")
 }

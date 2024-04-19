@@ -14,6 +14,13 @@ import Chip from '@mui/material/Chip';
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import DeleteIcon from '@mui/icons-material/Delete';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import Button from '@mui/material/Button';
+import DialogTitle from '@mui/material/DialogTitle';
 
 import { fetchAllCustomer, fetchCustomer, removeCustomer } from "@/components/dashboard/customer/api";
 import { ClientForm } from "@/components/dashboard/shared/ClientForm";
@@ -21,11 +28,14 @@ import { useCustomerContext } from "@/components/dashboard/customer/customers-la
 import CircularIndeterminate from '@/components/dashboard/shared/CircularIndeterminate';
 import { fetchAdmin } from "@/components/dashboard/agency/api";
 import { setStatusLabel, setStatusColors } from "@/app/dashboard/helpers";
+import { Transition } from "@/components/dashboard/customer/helpers";
 
 export function CustomersTable() {
   const [isLoading, setLoading] = useState<boolean>(true);
   const [agencyId, setAgencyId] = useState<string>('');
   const [role, setRole] = useState<string>('');
+  const [clientId, setClientId] = useState<string>('');
+  const [isDialogOpen, setDialogOpen] = useState<boolean>(false);
 
   const {
     isModalOpenContext,
@@ -74,13 +84,25 @@ export function CustomersTable() {
     setModalOpenContext(value);
   };
 
+  const handleDialogClose = () => {
+    setDialogOpen(false);
+  };
+
   const handleDelete = async (id:string) => {
+    setDialogOpen(true);
+    setClientId(id)
+  };
+
+  const handleDeleteClient = async () => {
     try {
-      await removeCustomer(id);
-      const updatedCustomers = customersContext.filter(customer => customer.id !== id);
+      await removeCustomer(clientId);
+      const updatedCustomers = customersContext.filter(customer => customer.id !== clientId);
       setCustomersContext(updatedCustomers);
     } catch (error) {
       console.error("Error occurred while deleting customer:", error);
+    } finally {
+      setClientId('');
+      setDialogOpen(false);
     }
   };
 
@@ -93,12 +115,13 @@ export function CustomersTable() {
         <Table sx={{ minWidth: '800px' }}>
           <TableHead>
             <TableRow>
-              <TableCell>Nome</TableCell>
-              <TableCell>Nome della ditta</TableCell>
+              <TableCell>Cliente</TableCell>
+              {/*<TableCell>Nome della ditta</TableCell>*/}
               <TableCell>Email</TableCell>
-              <TableCell>Telefono</TableCell>
-              <TableCell>Stato POD</TableCell>
-              <TableCell>Stato PRD</TableCell>
+              <TableCell>Cellulare</TableCell>
+              <TableCell>Stato Luce</TableCell>
+              <TableCell>Stato Gas</TableCell>
+              <TableCell>Stato Fibra</TableCell>
               <TableCell>Azioni</TableCell>
             </TableRow>
           </TableHead>
@@ -106,9 +129,9 @@ export function CustomersTable() {
             {customersContext.map((row) =>
               <TableRow hover key={row.id} >
                 <TableCell>
-                  <Typography variant="subtitle2">{row.firstName}</Typography>
+                  <Typography variant="subtitle2">{row.firstName}, {row.companyName}</Typography>
                 </TableCell>
-                <TableCell>{row.companyName}</TableCell>
+                {/*<TableCell>{row.companyName}</TableCell>*/}
                 <TableCell>{row.email}</TableCell>
                 <TableCell>{row.phoneNumber}</TableCell>
                 <TableCell>
@@ -129,6 +152,16 @@ export function CustomersTable() {
                       sx={{ minWidth: '100px' }}
                       label={setStatusLabel(row?.pdr_status)}
                       color={setStatusColors(row?.pdr_status)}
+                    />
+                  }
+                </TableCell>
+                <TableCell>
+                  {
+                    row?.fibra_status && row?.fibreSelected && <Chip
+                      size="small"
+                      sx={{ minWidth: '100px' }}
+                      label={setStatusLabel(row?.fibra_status)}
+                      color={setStatusColors(row?.fibra_status)}
                     />
                   }
                 </TableCell>
@@ -155,6 +188,48 @@ export function CustomersTable() {
         </Table>
       </Box>
       <Divider />
+      <Dialog
+        open={isDialogOpen}
+        onClose={handleDialogClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        TransitionComponent={Transition}
+        keepMounted
+      >
+        <DialogTitle id="alert-dialog-title">
+          Sei sicuro di cancellare?
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Questa finestra di dialogo modale ti chiede di confermare la tua decisione di eliminare un cliente dall'agenzia. Facendo clic su "Cancellare", procederai con il processo di eliminazione.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            startIcon={<DeleteIcon />}
+            color="error"
+            variant="contained"
+            size="medium"
+            onClick={handleDeleteClient}
+            autoFocus
+            sx={{
+              minWidth: '100px'
+            }}
+          >
+            Cancellare</Button>
+          <Button
+            color="info"
+            variant="contained"
+            size="medium"
+            onClick={handleDialogClose}
+            sx={{
+              minWidth: '100px'
+            }}
+          >
+            Annulla
+          </Button>
+        </DialogActions>
+      </Dialog>
       {
         isModalOpenContext && <ClientForm
           role={role}
