@@ -50,7 +50,7 @@ export function CustomersFilters() {
           onClick={handleClick}
           variant="contained"
           size="medium">
-          Aggiungi clienti
+          Aggiungi cliente
         </Button>
       </Card>
       {

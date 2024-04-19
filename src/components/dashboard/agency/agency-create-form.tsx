@@ -26,6 +26,15 @@ import {
 import { AgencyCard } from '@/components/dashboard/agency/agency-card';
 import CircularIndeterminate from '@/components/dashboard/shared/CircularIndeterminate';
 
+const inputStyles = {
+  "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button": {
+    display: "none",
+  },
+  "& input[type=number]": {
+    MozAppearance: "textfield",
+  },
+};
+
 export function AgencyCreateForm(): React.JSX.Element {
   const [adminInfo, setAdminInfo] = useState<FormData | {}>({});
   const [isFormEditing, setFormEditing] = useState<boolean>(false);
@@ -93,7 +102,7 @@ export function AgencyCreateForm(): React.JSX.Element {
       {
         isFormEditing && <form onSubmit={handleSubmit(onSubmit)}>
           <Card>
-            <CardHeader title="Fields azienda" />
+            <CardHeader title="Informazioni sull'agenzia" />
             <Divider />
             <CardContent>
               <Box mb={2} sx={{ flexGrow: 1 }}>
@@ -107,7 +116,7 @@ export function AgencyCreateForm(): React.JSX.Element {
                         <TextField
                           error={Boolean(errors.companyName)}
                           id="outlined-error-helper-text"
-                          label="Denominazione / ragione sociale*"
+                          label="Denominazione / ragione sociale *"
                           helperText={errors?.companyName?.message}
                           variant="outlined"
                           {...register('companyName')}
@@ -120,7 +129,7 @@ export function AgencyCreateForm(): React.JSX.Element {
                         <TextField
                           error={Boolean(errors.firstName)}
                           id="outlined-error-helper-text"
-                          label="Nome cognome responsabile*"
+                          label="Nome cognome responsabile *"
                           helperText={errors?.firstName?.message}
                           variant="outlined"
                           {...register('firstName')}
@@ -133,7 +142,7 @@ export function AgencyCreateForm(): React.JSX.Element {
                         <TextField
                           error={Boolean(errors.officeAddress)}
                           id="outlined-error-helper-text"
-                          label="Indirizzo Sede Legale*"
+                          label="Indirizzo Sede Legale *"
                           helperText={errors?.officeAddress?.message}
                           variant="outlined"
                           {...register('officeAddress')}
@@ -146,7 +155,7 @@ export function AgencyCreateForm(): React.JSX.Element {
                         <TextField
                           error={Boolean(errors.officePostCode)}
                           id="outlined-error-helper-text"
-                          label="CAP*"
+                          label="CAP *"
                           helperText={errors?.officePostCode?.message}
                           variant="outlined"
                           {...register('officePostCode')}
@@ -159,7 +168,7 @@ export function AgencyCreateForm(): React.JSX.Element {
                         <TextField
                           error={Boolean(errors.officeCity)}
                           id="outlined-error-helper-text"
-                          label="Città*"
+                          label="Città *"
                           helperText={errors?.officeCity?.message}
                           variant="outlined"
                           {...register('officeCity')}
@@ -172,7 +181,7 @@ export function AgencyCreateForm(): React.JSX.Element {
                         <TextField
                           error={Boolean(errors.officeProvince)}
                           id="outlined-error-helper-text"
-                          label="Provincia*"
+                          label="Provincia *"
                           helperText={errors?.officeProvince?.message}
                           variant="outlined"
                           {...register('officeProvince')}
@@ -221,7 +230,7 @@ export function AgencyCreateForm(): React.JSX.Element {
                         <TextField
                           error={Boolean(errors.vat)}
                           id="outlined-error-helper-text"
-                          label="Partita IVA*"
+                          label="Partita IVA / C.F. *"
                           helperText={errors?.vat?.message}
                           variant="outlined"
                           {...register('vat')}
@@ -234,7 +243,7 @@ export function AgencyCreateForm(): React.JSX.Element {
                         <TextField
                           error={Boolean(errors.iban)}
                           id="outlined-error-helper-text"
-                          label="IBAN (per pagamento provvigioni)*"
+                          label="IBAN (per pagamento provvigioni) *"
                           helperText={errors?.iban?.message}
                           variant="outlined"
                           {...register('iban')}
@@ -254,7 +263,7 @@ export function AgencyCreateForm(): React.JSX.Element {
                         <TextField
                           error={Boolean(errors.adminEmail)}
                           id="outlined-error-helper-text"
-                          label="Email*"
+                          label="Email *"
                           helperText={errors?.adminEmail?.message}
                           variant="outlined"
                           {...register('adminEmail')}
@@ -265,25 +274,29 @@ export function AgencyCreateForm(): React.JSX.Element {
                     <Grid item xs={6} md={3}>
                       <FormControl fullWidth required>
                         <TextField
-                          error={Boolean(errors.phoneNumber)}
+                          sx={inputStyles}
+                          type="number"
+                          error={Boolean(errors.mobileNumber)}
                           id="outlined-error-helper-text"
-                          label="Tell*"
-                          helperText={errors?.phoneNumber?.message}
+                          label="Cellulare *"
+                          helperText={errors?.mobileNumber?.message}
                           variant="outlined"
-                          {...register('phoneNumber')}
+                          {...register('mobileNumber')}
                           InputLabelProps={{ shrink: true }}
                         />
                       </FormControl>
                     </Grid>
                     <Grid item xs={6} md={3}>
-                      <FormControl fullWidth required>
+                      <FormControl fullWidth>
                         <TextField
-                          error={Boolean(errors.mobileNumber)}
+                          sx={inputStyles}
+                          type="number"
+                          error={Boolean(errors.phoneNumber)}
                           id="outlined-error-helper-text"
-                          label="Cell*"
-                          helperText={errors?.mobileNumber?.message}
+                          label="Tellefono"
+                          helperText={errors?.phoneNumber?.message}
                           variant="outlined"
-                          {...register('mobileNumber')}
+                          {...register('phoneNumber')}
                           InputLabelProps={{ shrink: true }}
                         />
                       </FormControl>

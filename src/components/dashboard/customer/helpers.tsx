@@ -2,7 +2,6 @@ import React from "react";
 import { TransitionProps } from "@mui/material/transitions";
 import Slide from "@mui/material/Slide";
 import * as Yup from "yup";
-import { phoneRegExp } from "@/components/dashboard/agency/constants";
 
 export const mergeObjects = (mainObj, obj) => {
   return { ...mainObj, ...obj };
@@ -16,6 +15,9 @@ export const Transition = React.forwardRef(function Transition(
 ) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
+
+// const italyIBANRegex = /[a-zA-Z0-9]{2}\s?([a-zA-Z]{1})([0-9]{3}\s?)([0-9]{4}\s?){1}([0-9]{3})([a-zA-Z0-9]{1}\s?)([a-zA-Z0-9]{4}\s?){2}([a-zA-Z0-9]{3})\s?/;
+const italyIBANRegex = /^IT[0-9]{2}[A-Z]{1}[0-9]{5}[0-9]{5}[A-Z0-9]{12}$/;
 
 export interface FormData {
   email: string;
@@ -46,7 +48,7 @@ export interface FormData {
 export const validationSchema = Yup.object().shape({
   email: Yup.string().email().required('L\'e-mail è obbligatoria'),
   vat: Yup.string().required('E\' richiesta l\'IVA'),
-  iban: Yup.string().required('È richiesto l\'IBAN'),
+  iban: Yup.string().matches(italyIBANRegex, 'IBAN non valido, esempio "IT60X0542811101000000123456"').required('È richiesto l\'IBAN'),
   firstName: Yup.string().required('Il nome del proprietario è obbligatorio'),
   companyName: Yup.string().required('Nome azienda/Cognome è obbligatorio'),
   operationAddress: Yup.string().required('È obbligatorio l\'indirizzo di fornitura completo di numero civico'),
@@ -57,9 +59,17 @@ export const validationSchema = Yup.object().shape({
   officePostCode: Yup.string().required('È richiesto il codice postale dell\'ufficio'),
   officeCity: Yup.string().required('La città dell\'ufficio è obbligatoria'),
   officeProvince: Yup.string().required('La provincia dell\'ufficio è obbligatoria'),
-  mobileNumber: Yup.string().matches(phoneRegExp, 'Il numero di telefono non è valido').required('Il numero di telefono è obbligatorio'),
+  mobileNumber: Yup.string().when([], ([], schema, values) => {
+    const { value } = values;
+    return value.length === 0 ? schema.required('Il numero di cellulare è obbligatorio') : schema.min(10, 'Il numero di cellulare ha una lunghezza minima di 10 cifre');
+  }),
+  phoneNumber: Yup.string().when([], ([], schema, values) => {
+    const { value } = values;
+    return value.length === 0 ? schema : schema.min(10, 'Il numero di telefono ha una lunghezza minima di 10 cifre');
+  }),
   pod_transfer: Yup.string(),
   pdr_transfer: Yup.string(),
+  fibra_transfer: Yup.string(),
   notes: Yup.string().notRequired(),
   gasSelected: Yup.boolean(),
   fibreSelected: Yup.boolean(),
@@ -70,12 +80,18 @@ export const validationSchema = Yup.object().shape({
     }
     return schema.required('Il servizio clienti è obbligatorio');
   }),
-  pod: Yup.string().when('electricitySelected', (electricitySelected, schema) => {
-    if (electricitySelected[0] === true) { return schema.required('Il campo è obbligatiorio'); }
+  pod: Yup.string().when('electricitySelected', (electricitySelected, schema, values) => {
+    if (electricitySelected[0] === true) {
+      const { value } = values;
+      return value.length === 0 ? schema.required('Il campo è obbligatorio') : schema.min(14, 'Il campo ha una lunghezza minima di 14 cifre');
+    }
     return schema;
   }),
-  pdr: Yup.string().when('gasSelected', (gasSelected, schema) => {
-    if (gasSelected[0] === true) { return schema.required('Il campo è obbligatiorio'); }
+  pdr: Yup.string().when('gasSelected', (gasSelected, schema, values) => {
+    if (gasSelected[0] === true) {
+      const { value } = values;
+      return value.length === 0 ? schema.required('Il campo è obbligatorio') : schema.min(14, 'Il campo ha una lunghezza minima di 14 cifre');
+    }
     return schema;
   }),
 });

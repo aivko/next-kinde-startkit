@@ -1,20 +1,24 @@
 import * as Yup from "yup";
 
-export const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
+// const italyIBANRegex = /[a-zA-Z0-9]{2}\s?([a-zA-Z]{1})([0-9]{3}\s?)([0-9]{4}\s?){1}([0-9]{3})([a-zA-Z0-9]{1}\s?)([a-zA-Z0-9]{4}\s?){2}([a-zA-Z0-9]{3})\s?/;
+const italyIBANRegex = /^IT[0-9]{2}[A-Z]{1}[0-9]{5}[0-9]{5}[A-Z0-9]{12}$/;
 export const apiUrl = '/api/admin';
 
 export const validationSchema = Yup.object().shape({
-  firstName: Yup.string().required('First name is required'),
-  officeAddress: Yup.string().required('Registered office address is required'),
-  officePostCode: Yup.string().required('Office post code is required'),
-  officeCity: Yup.string().required('Office city is required'),
-  officeProvince: Yup.string().required('Office province is required'),
-  vat: Yup.string().required('Office province is required'),
-  iban: Yup.string().required('Office province is required'),
-  companyName: Yup.string().required('Company name is required'),
-  adminEmail: Yup.string().email().required('Email is required'),
-  phoneNumber: Yup.string().matches(phoneRegExp, 'Phone number is not valid').required('Phone number is required'),
-  mobileNumber: Yup.string().matches(phoneRegExp, 'Phone number is not valid').required('Phone number is required'),
+  firstName: Yup.string().required('Il nome del proprietario è obbligatorio'),
+  officeAddress: Yup.string().required('L\'indirizzo della sede legale è obbligatorio'),
+  officePostCode: Yup.string().required('È richiesto il codice postale dell\'ufficio'),
+  officeCity: Yup.string().required('La città dell\'ufficio è obbligatoria'),
+  officeProvince: Yup.string().required('La provincia dell\'ufficio è obbligatoria'),
+  vat: Yup.string().required('E\' richiesta l\'IVA'),
+  iban: Yup.string().matches(italyIBANRegex, 'IBAN non valido, esempio "IT60X0542811101000000123456"').required('È richiesto l\'IBAN'),
+  companyName: Yup.string().required('Nome azienda/Cognome è obbligatorio'),
+  adminEmail: Yup.string().email().required('L\'e-mail è obbligatoria'),
+  phoneNumber: Yup.string().when([], ([], schema, values) => {
+    const { value } = values;
+    return value.length === 0 ? schema : schema.min(10, 'Il numero di telefono ha una lunghezza minima di 10 cifre');
+  }),
+  mobileNumber: Yup.string().min(10, 'Il numero di cellulare ha una lunghezza minima di 10 cifre').required('Il numero di cellulare è obbligatorio'),
 });
 
 export interface FormData {

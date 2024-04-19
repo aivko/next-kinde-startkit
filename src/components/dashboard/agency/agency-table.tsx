@@ -26,17 +26,17 @@ import { ClientForm } from "@/components/dashboard/shared/ClientForm";
 import { setStatusLabel, setStatusColors } from "@/app/dashboard/helpers";
 
 interface Column {
-  id: 'name' | 'email' | 'pod' | 'companyName' | 'action' | 'pdr';
+  id: 'name' | 'email' | 'luce' | 'gas' | 'action' | 'fibra';
   label: string;
   minWidth?: number;
 }
 
 const columns: readonly Column[] = [
-  { id: 'companyName', label: 'Nome della ditta' },
-  { id: 'name', label: 'Nome' },
+  { id: 'name', label: 'Cliente' },
   { id: 'email', label: 'Email' },
-  { id: 'pod', label: 'Stato POD' },
-  { id: 'pdr', label: 'Stato PRD' },
+  { id: 'luce', label: 'Stato Luce' },
+  { id: 'gas', label: 'Stato Gas' },
+  { id: 'fibra', label: 'Stato Fibra' },
   { id: 'action', label: 'Azione' },
 ];
 
@@ -56,7 +56,7 @@ export default function AgencyTable({ agencies, adminInfo }) {
     setLoading(true);
     fetchAllCustomer({ id })
       .then(res => {
-        setCustomers(res.data);
+        setCustomers(res.data.reverse());
       }).finally(() => {
         setLoading(false);
     })
@@ -168,10 +168,7 @@ export default function AgencyTable({ agencies, adminInfo }) {
                         return (
                           <TableRow hover role="checkbox" tabIndex={-1} key={customer.id}>
                             <TableCell>
-                              { customer.companyName }
-                            </TableCell>
-                            <TableCell>
-                              { customer.firstName }
+                              { customer.firstName }, { customer.companyName }
                             </TableCell>
                             <TableCell>
                               { customer.email }
@@ -193,6 +190,16 @@ export default function AgencyTable({ agencies, adminInfo }) {
                                   sx={{ minWidth: '100px' }}
                                   label={setStatusLabel(customer?.pdr_status)}
                                   color={setStatusColors(customer?.pdr_status)}
+                                />
+                              }
+                            </TableCell>
+                            <TableCell>
+                              {
+                                customer?.fibra_status && customer?.fibreSelected && <Chip
+                                  size="small"
+                                  sx={{ minWidth: '100px' }}
+                                  label={setStatusLabel(customer?.fibra_status)}
+                                  color={setStatusColors(customer?.fibra_status)}
                                 />
                               }
                             </TableCell>

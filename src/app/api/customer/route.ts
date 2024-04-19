@@ -61,11 +61,10 @@ export async function POST(req:any) {
 }
 
 export async function PATCH(req:any) {
-  const user:any = await initKindeServerSession();
   const payload = await req.json();
 
   const data = await patchCustomerHandler({
-    id: user.id,
+    id: payload.agencyId,
     data: payload,
   });
 
