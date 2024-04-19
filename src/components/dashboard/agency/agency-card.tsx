@@ -86,7 +86,7 @@ export const AgencyCard: FC<AccountInfoProps> = ({ adminInfo, handleFormEditing 
         </Card>
       </Grid>
       { adminInfo.role === 'super_admin' && <Grid item lg={12} md={12} xs={12}>
-        <Typography mb={2} variant="h5">Elenco Agenzie</Typography>
+        <Typography mb={2} variant="h5">Lista delle Agenzie</Typography>
         <AgencyTable
           adminInfo={adminInfo}
           agencies={agencies}
