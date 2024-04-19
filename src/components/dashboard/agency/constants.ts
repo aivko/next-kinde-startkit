@@ -18,7 +18,10 @@ export const validationSchema = Yup.object().shape({
     const { value } = values;
     return value.length === 0 ? schema : schema.min(10, 'Il numero di telefono ha una lunghezza minima di 10 cifre');
   }),
-  mobileNumber: Yup.string().min(10, 'Il numero di cellulare ha una lunghezza minima di 10 cifre').required('Il numero di cellulare è obbligatorio'),
+  mobileNumber: Yup.string().when([], ([], schema, values) => {
+    const { value } = values;
+    return value.length === 0 ? schema.required('Il numero di cellulare è obbligatorio') : schema.min(10, 'Il numero di cellulare ha una lunghezza minima di 10 cifre');
+  }),
 });
 
 export interface FormData {
