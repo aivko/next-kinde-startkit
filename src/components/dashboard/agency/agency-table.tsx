@@ -24,6 +24,13 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import { ClientForm } from "@/components/dashboard/shared/ClientForm";
 import { setStatusLabel, setStatusColors } from "@/app/dashboard/helpers";
+import { Transition } from "@/components/dashboard/customer/helpers";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogActions from "@mui/material/DialogActions";
+import DeleteIcon from "@mui/icons-material/Delete";
+import Dialog from "@mui/material/Dialog";
 
 interface Column {
   id: 'name' | 'email' | 'luce' | 'gas' | 'action' | 'fibra';
@@ -37,7 +44,7 @@ const columns: readonly Column[] = [
   { id: 'luce', label: 'Stato Luce' },
   { id: 'gas', label: 'Stato Gas' },
   { id: 'fibra', label: 'Stato Fibra' },
-  { id: 'action', label: 'Azione' },
+  { id: 'action', label: 'Azioni' },
 ];
 
 export default function AgencyTable({ agencies, adminInfo }) {
@@ -46,6 +53,8 @@ export default function AgencyTable({ agencies, adminInfo }) {
   const [customer, setCustomer] = React.useState<{}>({});
   const [customers, setCustomers] = React.useState<[]>([]);
   const [isLoading, setLoading] = React.useState<boolean | false>(false);
+  const [agencyClient, setAgencyClient] = React.useState<object>({});
+  const [isDialogOpen, setDialogOpen] = React.useState<boolean>(false);
 
   const handleChange = (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
     setCustomers([]);
@@ -75,8 +84,26 @@ export default function AgencyTable({ agencies, adminInfo }) {
     setModalOpen(true);
   };
 
-  const handleDelete = async (customer: object) => {
-    setCustomer(customer);
+  const handleDelete = async (client: object) => {
+    setDialogOpen(true);
+    setAgencyClient(client)
+  };
+
+  const handleDialogClose = () => {
+    setDialogOpen(false);
+  };
+
+  const handleDeleteClient = async () => {
+    try {
+      await removeCustomer(agencyClient);
+      const updatedCustomers = customers.filter(customer => customer.id !== agencyClient.id);
+      setCustomers(updatedCustomers);
+    } catch (error) {
+      console.error("Error occurred while deleting customer:", error);
+    } finally {
+      setAgencyClient({});
+      setDialogOpen(false);
+    }
   };
 
   return (
@@ -213,7 +240,7 @@ export default function AgencyTable({ agencies, adminInfo }) {
                               </IconButton>
 
                               <IconButton
-                                onClick={() => handleDelete(customer.id)}
+                                onClick={() => handleDelete(customer)}
                                 aria-label="delte"
                                 size="small"
                               >
@@ -241,6 +268,48 @@ export default function AgencyTable({ agencies, adminInfo }) {
           </Accordion>
         ))
       }
+      <Dialog
+        open={isDialogOpen}
+        onClose={handleDialogClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        TransitionComponent={Transition}
+        keepMounted
+      >
+        <DialogTitle id="alert-dialog-title">
+          Sei sicuro di cancellare?
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Questa finestra di dialogo modale ti chiede di confermare la tua decisione di eliminare un cliente dall'agenzia. Facendo clic su "Cancellare", procederai con il processo di eliminazione.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            startIcon={<DeleteIcon />}
+            color="error"
+            variant="contained"
+            size="medium"
+            onClick={handleDeleteClient}
+            autoFocus
+            sx={{
+              minWidth: '100px'
+            }}
+          >
+            Cancellare</Button>
+          <Button
+            color="info"
+            variant="contained"
+            size="medium"
+            onClick={handleDialogClose}
+            sx={{
+              minWidth: '100px'
+            }}
+          >
+            Annulla
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }

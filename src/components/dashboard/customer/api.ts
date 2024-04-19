@@ -63,10 +63,10 @@ export const fetchCustomer = async (payload: any) => {
   });
 };
 
-export const removeCustomer = async (id:string) => {
+export const removeCustomer = async (client:object) => {
   return sendRequest({
     method: "DELETE",
     uri: "/api/customer",
-    payload: id
+    payload: client
   });
 };

@@ -34,7 +34,7 @@ export function CustomersTable() {
   const [isLoading, setLoading] = useState<boolean>(true);
   const [agencyId, setAgencyId] = useState<string>('');
   const [role, setRole] = useState<string>('');
-  const [clientId, setClientId] = useState<string>('');
+  const [agencyClient, setAgencyClient] = useState<object>({});
   const [isDialogOpen, setDialogOpen] = useState<boolean>(false);
 
   const {
@@ -88,20 +88,20 @@ export function CustomersTable() {
     setDialogOpen(false);
   };
 
-  const handleDelete = async (id:string) => {
+  const handleDelete = async (client:object) => {
     setDialogOpen(true);
-    setClientId(id)
+    setAgencyClient(client)
   };
 
   const handleDeleteClient = async () => {
     try {
-      await removeCustomer(clientId);
-      const updatedCustomers = customersContext.filter(customer => customer.id !== clientId);
+      await removeCustomer(agencyClient);
+      const updatedCustomers = customersContext.filter(customer => customer.id !== agencyClient.id);
       setCustomersContext(updatedCustomers);
     } catch (error) {
       console.error("Error occurred while deleting customer:", error);
     } finally {
-      setClientId('');
+      setAgencyClient({});
       setDialogOpen(false);
     }
   };
@@ -116,7 +116,6 @@ export function CustomersTable() {
           <TableHead>
             <TableRow>
               <TableCell>Cliente</TableCell>
-              {/*<TableCell>Nome della ditta</TableCell>*/}
               <TableCell>Email</TableCell>
               <TableCell>Cellulare</TableCell>
               <TableCell>Stato Luce</TableCell>
@@ -131,7 +130,6 @@ export function CustomersTable() {
                 <TableCell>
                   <Typography variant="subtitle2">{row.firstName}, {row.companyName}</Typography>
                 </TableCell>
-                {/*<TableCell>{row.companyName}</TableCell>*/}
                 <TableCell>{row.email}</TableCell>
                 <TableCell>{row.phoneNumber}</TableCell>
                 <TableCell>
@@ -175,7 +173,7 @@ export function CustomersTable() {
                   </IconButton>
 
                   <IconButton
-                    onClick={() => handleDelete(row.id)}
+                    onClick={() => handleDelete(row)}
                     aria-label="delte"
                     size="small"
                   >

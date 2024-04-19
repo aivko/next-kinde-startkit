@@ -72,12 +72,11 @@ export async function PATCH(req:any) {
 }
 
 export async function DELETE(req:any) {
-  const user:any = await initKindeServerSession();
   const payload = await req.json();
 
   const data = await removeCustomerHandler({
-    id: user.id,
-    data: payload,
+    id: payload.agencyId,
+    data: payload.id,
   });
 
   return NextResponse.json({ data });
