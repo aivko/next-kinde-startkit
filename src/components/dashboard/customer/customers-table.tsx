@@ -49,7 +49,6 @@ export function CustomersTable() {
   useEffect(() => {
     fetchAdmin().then(res => {
       const { id, role } = res.data;
-      console.log(role)
       setRole(role)
       setAgencyId(id);
       fetchAllCustomer({ id })

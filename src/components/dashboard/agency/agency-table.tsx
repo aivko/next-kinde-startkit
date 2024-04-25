@@ -1,60 +1,23 @@
 import * as React from 'react';
 import Paper from '@mui/material/Paper';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import Button from '@mui/material/Button';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
-import { fetchAllCustomer, fetchCustomer, removeCustomer } from "@/components/dashboard/customer/api";
+import { fetchAllCustomer } from "@/components/dashboard/customer/api";
 import Chip from "@mui/material/Chip";
-import IconButton from "@mui/material/IconButton";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import { ClientForm } from "@/components/dashboard/shared/ClientForm";
-import { setStatusLabel, setStatusColors } from "@/app/dashboard/helpers";
-import { Transition } from "@/components/dashboard/customer/helpers";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogActions from "@mui/material/DialogActions";
-import DeleteIcon from "@mui/icons-material/Delete";
-import Dialog from "@mui/material/Dialog";
-
-interface Column {
-  id: 'name' | 'email' | 'luce' | 'gas' | 'action' | 'fibra';
-  label: string;
-  minWidth?: number;
-}
-
-const columns: readonly Column[] = [
-  { id: 'name', label: 'Cliente' },
-  { id: 'email', label: 'Email' },
-  { id: 'luce', label: 'Stato Luce' },
-  { id: 'gas', label: 'Stato Gas' },
-  { id: 'fibra', label: 'Stato Fibra' },
-  { id: 'action', label: 'Azioni' },
-];
+import StickyTable from "@/components/dashboard/shared/StickyTable";
+import AgencyCardContent from "@/components/dashboard/agency/agency-card-content";
 
 export default function AgencyTable({ agencies, adminInfo }) {
-  const [isModalOpen, setModalOpen] = React.useState<boolean | false>(false);
   const [expanded, setExpanded] = React.useState<string | false>(false);
-  const [customer, setCustomer] = React.useState<{}>({});
   const [customers, setCustomers] = React.useState<[]>([]);
   const [isLoading, setLoading] = React.useState<boolean | false>(false);
-  const [agencyClient, setAgencyClient] = React.useState<object>({});
-  const [isDialogOpen, setDialogOpen] = React.useState<boolean>(false);
 
   const handleChange = (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
     setCustomers([]);
@@ -71,40 +34,9 @@ export default function AgencyTable({ agencies, adminInfo }) {
     })
   }
 
-  const handleModal = (val:boolean) => {
-    setModalOpen(val);
-  };
-
-  const handleCustomers = (val) => {
-    setCustomers(val);
-  };
-
-  const handleEdit = async (customer: object) => {
-    setCustomer(customer);
-    setModalOpen(true);
-  };
-
-  const handleDelete = async (client: object) => {
-    setDialogOpen(true);
-    setAgencyClient(client)
-  };
-
-  const handleDialogClose = () => {
-    setDialogOpen(false);
-  };
-
-  const handleDeleteClient = async () => {
-    try {
-      await removeCustomer(agencyClient);
-      const updatedCustomers = customers.filter(customer => customer.id !== agencyClient.id);
-      setCustomers(updatedCustomers);
-    } catch (error) {
-      console.error("Error occurred while deleting customer:", error);
-    } finally {
-      setAgencyClient({});
-      setDialogOpen(false);
-    }
-  };
+  const updateCustomers = (customers:any) => {
+    setCustomers(customers)
+  }
 
   return (
     <>
@@ -135,33 +67,7 @@ export default function AgencyTable({ agencies, adminInfo }) {
             <AccordionDetails>
               <Card sx={{ minWidth: 275 }}>
                 <CardContent>
-                  <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                    <b>Nome della ditta:</b> { agency.companyName }
-                  </Typography>
-                  <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                    <b>Email:</b> { agency.email }
-                  </Typography>
-                  <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                    <b>Nome:</b> { agency.firstName }
-                  </Typography>
-                  <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                    <b>IBAN:</b> { agency.iban } | VAT: { agency.vat }
-                  </Typography>
-                  <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                    <b>Numero di cellulare e numero di telefono:</b> { agency.mobileNumber }, { agency.phoneNumber }
-                  </Typography>
-                  <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                    <b>Indirizzo dell'ufficio:</b> { agency.officeCity }, { agency.officeAddress }, { agency.officeProvince }, { agency.officePostCode }
-                  </Typography>
-                  <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                    <b>Indirizzo dell'operazione:</b> { agency.operationCity }, { agency.operationAddress }, { agency.operationProvince }, { agency.operationPostCode }
-                  </Typography>
-                  <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                    <b>Sito web:</b> { agency.website }
-                  </Typography>
-                  <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                    <b>Appunti:</b> { agency.notes }
-                  </Typography>
+                  <AgencyCardContent agency={agency} />
                 </CardContent>
                 <CardActions>
                   <LoadingButton
@@ -176,140 +82,16 @@ export default function AgencyTable({ agencies, adminInfo }) {
             </AccordionDetails>
             {
               customers.length > 0 && <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-                <TableContainer sx={{ maxHeight: 440 }}>
-                  <Table stickyHeader aria-label="sticky table">
-                    <TableHead>
-                      <TableRow>
-                        {columns.map((column) => (
-                          <TableCell
-                            key={column.id}
-                            style={{ minWidth: column.minWidth }}
-                          >
-                            {column.label}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {customers.map((customer) => {
-                        return (
-                          <TableRow hover role="checkbox" tabIndex={-1} key={customer.id}>
-                            <TableCell>
-                              { customer.firstName }, { customer.companyName }
-                            </TableCell>
-                            <TableCell>
-                              { customer.email }
-                            </TableCell>
-                            <TableCell>
-                              {
-                                customer?.pod_status && customer?.pod && <Chip
-                                  size="small"
-                                  sx={{ minWidth: '100px' }}
-                                  label={setStatusLabel(customer?.pod_status)}
-                                  color={setStatusColors(customer?.pod_status)}
-                                />
-                              }
-                            </TableCell>
-                            <TableCell>
-                              {
-                                customer?.pdr_status && customer?.pdr && <Chip
-                                  size="small"
-                                  sx={{ minWidth: '100px' }}
-                                  label={setStatusLabel(customer?.pdr_status)}
-                                  color={setStatusColors(customer?.pdr_status)}
-                                />
-                              }
-                            </TableCell>
-                            <TableCell>
-                              {
-                                customer?.fibra_status && customer?.fibreSelected && <Chip
-                                  size="small"
-                                  sx={{ minWidth: '100px' }}
-                                  label={setStatusLabel(customer?.fibra_status)}
-                                  color={setStatusColors(customer?.fibra_status)}
-                                />
-                              }
-                            </TableCell>
-                            <TableCell>
-                              <IconButton
-                                onClick={() => handleEdit(customer)}
-                                aria-label="edit"
-                                size="small"
-                              >
-                                <EditIcon />
-                              </IconButton>
-
-                              <IconButton
-                                onClick={() => handleDelete(customer)}
-                                aria-label="delte"
-                                size="small"
-                              >
-                                <DeleteForeverIcon />
-                              </IconButton>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                <StickyTable
+                  customers={customers}
+                  handleEditCustomer={updateCustomers}
+                  handleDeleteCustomer={updateCustomers}
+                />
               </Paper>
-            }
-            {
-              customer?.id && <ClientForm
-                role={adminInfo.role}
-                customer={customer}
-                customers={customers}
-                isModalOpen={isModalOpen}
-                setCustomers={handleCustomers}
-                setModalOpen={handleModal}
-              />
             }
           </Accordion>
         ))
       }
-      <Dialog
-        open={isDialogOpen}
-        onClose={handleDialogClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        TransitionComponent={Transition}
-        keepMounted
-      >
-        <DialogTitle id="alert-dialog-title">
-          Sei sicuro di cancellare?
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Questa finestra di dialogo modale ti chiede di confermare la tua decisione di eliminare un cliente dall'agenzia. Facendo clic su "Cancellare", procederai con il processo di eliminazione.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            startIcon={<DeleteIcon />}
-            color="error"
-            variant="contained"
-            size="medium"
-            onClick={handleDeleteClient}
-            autoFocus
-            sx={{
-              minWidth: '100px'
-            }}
-          >
-            Cancellare</Button>
-          <Button
-            color="info"
-            variant="contained"
-            size="medium"
-            onClick={handleDialogClose}
-            sx={{
-              minWidth: '100px'
-            }}
-          >
-            Annulla
-          </Button>
-        </DialogActions>
-      </Dialog>
     </>
   );
 }

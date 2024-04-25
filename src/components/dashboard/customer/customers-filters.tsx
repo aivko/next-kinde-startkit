@@ -23,7 +23,7 @@ export function CustomersFilters() {
   };
 
   const handleCustomers = async (value) => {
-    console.log(value)
+    // console.log(value)
   };
 
   const handleModal = async (value:boolean) => {

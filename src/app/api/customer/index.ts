@@ -10,13 +10,13 @@ export async function postGetAllCustomersHandler({ req }: { req: any }) {
   return await postGetAllCustomers(req);
 }
 
+export async function getCustomersHandler() {
+  return await fetchAllCustomersDb();
+}
+
 export async function getCustomerHandler({ req }: { req: any }) {
   return await fetchCustomerDb(req);
 }
-
-// export async function getAllCustomerHandler({ id }: { id: any }) {
-//   return await fetchAllCustomerDb({ id });
-// }
 
 export async function patchCustomerHandler({ data, id }: { data: any, id: any }) {
   return await updateCustomerDb(data, id);
@@ -75,21 +75,19 @@ async function updateCustomerDb(data: any, id: any) {
   }
 }
 
-// async function fetchAllCustomerDb({ id }: { id:string }) {
-//   try {
-//     return await prisma.customer.findMany({
-//       where: { agencyId: id },
-//     });
-//   } catch (error) {
-//     throw error;
-//   }
-// }
-
 export async function postGetAllCustomers(payload: any) {
   try {
     return await prisma.customer.findMany({
       where: { agencyId: payload.id },
     });
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function fetchAllCustomersDb() {
+  try {
+    return await prisma.customer.findMany();
   } catch (error) {
     throw error;
   }
