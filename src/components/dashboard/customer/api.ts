@@ -70,3 +70,10 @@ export const removeCustomer = async (client:object) => {
     payload: client
   });
 };
+
+export const fetchCustomersList = async () => {
+  return sendRequest({
+    method: "GET",
+    uri: '/api/customer',
+  });
+};

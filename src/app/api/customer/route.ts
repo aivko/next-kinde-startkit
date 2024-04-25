@@ -3,9 +3,9 @@ import { NextResponse, NextRequest } from "next/server";
 import {
   postCustomerHandler,
   postGetAllCustomersHandler,
+  getCustomersHandler,
   getCustomerHandler,
   patchCustomerHandler,
-  // getAllCustomerHandler,
   removeCustomerHandler,
 } from "./index";
 
@@ -19,22 +19,10 @@ const initKindeServerSession = async () => {
   return await getUser();
 }
 
-export async function GET(req : NextRequest) {
-  // const user:any = await initKindeServerSession();
-  // const url = new URL(req.url);
-  // let data:any;
+export async function GET() {
+  const data = await getCustomersHandler();
 
-  // if (url.search === "?all") {
-  //   data = await getAllCustomerHandler({ id: user.id });
-  // } else {
-  //   const customerId = url.search.replace(/^(\?id)/, '');
-  //   data = await getCustomerHandler({ id: user.id, customerId });
-  // }
-
-  // const customerId = url.search.replace(/^(\?id)/, '');
-  // const data = await getCustomerHandler({ id: user.id, customerId });
-  //
-  // return NextResponse.json({ data });
+  return NextResponse.json({ data });
 }
 
 export async function POST(req:any) {

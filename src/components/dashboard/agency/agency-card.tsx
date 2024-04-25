@@ -8,7 +8,8 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
-import AgencyTable from './agency-table'
+import AgencyTable from '@/components/dashboard/agency/agency-table'
+import AgencyTabs from "@/components/dashboard/agency/agency-tabs";
 import { fetchAgencies } from "@/components/dashboard/agency/api";
 
 interface AdminInfo {
@@ -85,13 +86,20 @@ export const AgencyCard: FC<AccountInfoProps> = ({ adminInfo, handleFormEditing 
           </CardActions>
         </Card>
       </Grid>
-      { adminInfo.role === 'super_admin' && <Grid item lg={12} md={12} xs={12}>
-        <Typography mb={2} variant="h5">Lista delle Agenzie</Typography>
-        <AgencyTable
-          adminInfo={adminInfo}
-          agencies={agencies}
-        />
-      </Grid> }
+      { adminInfo.role === 'super_admin' && agencies.length > 0 && <>
+        <Grid item lg={12} md={12} xs={12}>
+          <Typography mb={2} variant="h5">Lista delle Agenzie</Typography>
+          <AgencyTable
+            adminInfo={adminInfo}
+            agencies={agencies}
+          />
+        </Grid>
+        <Grid item lg={12} md={12} xs={12}>
+          <Typography mb={2} variant="h5">Elenco dei clienti per stato</Typography>
+          <AgencyTabs />
+        </Grid>
+      </>
+      }
     </Grid>
   );
 };
