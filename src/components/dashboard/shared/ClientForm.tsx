@@ -230,7 +230,7 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
           >
           </IconButton>
           <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
-            Fields Cliente Servizi
+            Informazioni Dettagliate sul cliente
           </Typography>
           <Button autoFocus color="inherit" onClick={handleClose}>
             <CloseIcon />
@@ -811,7 +811,7 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
                     {addedFilesError &&  <Typography variant="body2" gutterBottom style={errorText}>
                       Documento riconoscimento <br/>
                       Bolletta luce / gas <br/>
-                      Nofece fiscale / Tesseta sanitaria
+                      Codice fiscale / Tessera sanitaria
                     </Typography>}
                     {loading && (
                       <CircularProgress
