@@ -737,7 +737,7 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
                             />
                             <FormControlLabel
                               value="fibra_nuova"
-                              label="Nuova numero"
+                              label="Nuovo numero"
                               sx={{
                                 minWidth: '171px'
                               }}
