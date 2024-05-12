@@ -47,6 +47,8 @@ interface CustomerProfileData {
   isVerified: boolean;
   isVerifiedBySA: boolean;
   files: object,
+  postalBulletin: boolean,
+  fiberMobileNumber: string,
 }
 
 async function createCustomerDb(payload: CustomerProfileData) {

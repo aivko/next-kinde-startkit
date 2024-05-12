@@ -77,3 +77,10 @@ export const filterByStatus = (data:any, status:string) => {
     }
   });
 }
+
+export  const isAbleToEditClientRows = ({ customer, role }) => {
+  const { electricitySelected, gasSelected, fibreSelected, pod_status, pdr_status, fibra_status } = customer;
+  if (role === 'super_admin') return true;
+  if (!(electricitySelected || gasSelected || fibreSelected)) return true;
+  return (pod_status === "submitted" && pdr_status === "submitted" && fibra_status === "submitted")
+};

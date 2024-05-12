@@ -32,6 +32,7 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Avatar from '@mui/material/Avatar';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
+import FormHelperText from '@mui/material/FormHelperText';
 
 import DeleteIcon from "@mui/icons-material/Delete";
 import ImageKit from "imagekit";
@@ -42,6 +43,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogActions from "@mui/material/DialogActions";
+import { isAbleToEditClientRows } from "@/components/dashboard/agency/constants";
 
 const inputStyles = {
   "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button": {
@@ -111,6 +113,8 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
       setValue('pod_transfer', customer.pod_transfer);
       setValue('pdr_transfer', customer.pdr_transfer);
       setValue('fibra_transfer', customer.fibra_transfer);
+      setValue('postalBulletin', customer.postalBulletin);
+      setValue('fiberMobileNumber', customer.fiberMobileNumber);
       setPodStatus(customer.pod_status);
       setPdrStatus(customer.pdr_status);
       setFibraStatus(customer.fibra_status);
@@ -210,7 +214,6 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
   const handleDeleteImage = async ({ id }) => {
     setImageId(id)
     setDialogOpen(true);
-
   };
 
   return (
@@ -289,11 +292,11 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
                     </FormControl>
                   </Grid>
                   <Grid item xs={6} md={3}>
-                    <FormControl fullWidth required>
+                    <FormControl fullWidth>
                       <TextField
                         error={Boolean(errors.iban)}
                         id="outlined-error-helper-text"
-                        label="IBAN (Accredito bollette) *"
+                        label="IBAN (Accredito bollette)"
                         helperText={errors?.iban?.message}
                         variant="outlined"
                         {...register('iban')}
@@ -459,6 +462,28 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
                       />
                     </FormControl>
                   </Grid>
+                  <Grid item xs={6} md={3}>
+                    <FormControlLabel
+                      labelPlacement="end"
+                      label="Bollettino postale"
+                      control={<Controller
+                        control={control}
+                        name="postalBulletin"
+                        defaultValue={false}
+                        {...register('postalBulletin')}
+                        render={({ field: { onChange, onBlur, value } }) => (
+                          <Checkbox
+                            id="postalBulletin"
+                            onChange={onChange}
+                            onBlur={onBlur}
+                            checked={!!value}
+                          />
+                        )}
+                      />}
+                    />
+                    { errors?.postalBulletin?.message && <FormHelperText style={errorText}>{errors?.postalBulletin?.message}</FormHelperText>}
+
+                  </Grid>
                   <Grid item xs={12} md={12}>
                     <Typography variant="h5" gutterBottom mb={1}>
                       Cliente Servizi
@@ -496,7 +521,6 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
                               {...register('electricitySelected')}
                               render={({ field: { onChange, onBlur, value } }) => (
                                 <Checkbox
-                                  // id="electricitySelected"
                                   onChange={onChange}
                                   onBlur={onBlur}
                                   checked={!!value}
@@ -719,7 +743,22 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
                           />
                         </Grid>
 
-                        <Grid item xs={4} md={4}></Grid>
+                        <Grid item xs={4} md={4}>
+                          <FormControl fullWidth required>
+                            <TextField
+                              sx={inputStyles}
+                              type="number"
+                              error={Boolean(errors.fiberMobileNumber)}
+                              id="outlined-error-helper-text"
+                              label="Cellulare *"
+                              helperText={errors?.fiberMobileNumber?.message}
+                              variant="outlined"
+                              {...register('fiberMobileNumber')}
+                              InputLabelProps={{ shrink: true }}
+                              size="small"
+                            />
+                          </FormControl>
+                        </Grid>
                         <Grid item>
                           <RadioGroup
                             row
@@ -869,6 +908,10 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
               Annulla
             </Button>
             <LoadingButton
+              disabled={!isAbleToEditClientRows({
+                customer,
+                role
+              })}
               loading={isLoadingButton}
               size="medium"
               type="submit"

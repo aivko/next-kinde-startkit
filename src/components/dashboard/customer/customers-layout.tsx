@@ -24,6 +24,7 @@ interface Customer {
   operationPostCode:string,
   operationProvince:string,
   phoneNumber:string,
+  postalBulletin: boolean,
 }
 
 interface ClientContextType {

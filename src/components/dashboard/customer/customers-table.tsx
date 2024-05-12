@@ -15,6 +15,7 @@ import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import DeleteIcon from '@mui/icons-material/Delete';
+import Visibility from "@mui/icons-material/Visibility";
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -27,8 +28,9 @@ import { ClientForm } from "@/components/dashboard/shared/ClientForm";
 import { useCustomerContext } from "@/components/dashboard/customer/customers-layout";
 import CircularIndeterminate from '@/components/dashboard/shared/CircularIndeterminate';
 import { fetchAdmin } from "@/components/dashboard/agency/api";
-import { setStatusLabel, setStatusColors } from "@/app/dashboard/helpers";
+import { setStatusLabel, setStatusIconsColors } from "@/app/dashboard/helpers";
 import { Transition } from "@/components/dashboard/customer/helpers";
+import { isAbleToEditClientRows } from "@/components/dashboard/agency/constants";
 
 export function CustomersTable() {
   const [isLoading, setLoading] = useState<boolean>(true);
@@ -135,9 +137,12 @@ export function CustomersTable() {
                   {
                     row?.pod_status && row?.pod && <Chip
                       size="small"
-                      sx={{ minWidth: '100px' }}
+                      sx={{
+                        minWidth: '100px',
+                        backgroundColor: setStatusIconsColors(row?.pod_status),
+                        color: 'white'
+                      }}
                       label={setStatusLabel(row?.pod_status)}
-                      color={setStatusColors(row?.pod_status)}
                     />
                   }
 
@@ -146,9 +151,12 @@ export function CustomersTable() {
                   {
                     row?.pdr_status && row?.pdr && <Chip
                       size="small"
-                      sx={{ minWidth: '100px' }}
+                      sx={{
+                        minWidth: '100px',
+                        backgroundColor: setStatusIconsColors(row?.pdr_status),
+                        color: 'white'
+                      }}
                       label={setStatusLabel(row?.pdr_status)}
-                      color={setStatusColors(row?.pdr_status)}
                     />
                   }
                 </TableCell>
@@ -156,28 +164,49 @@ export function CustomersTable() {
                   {
                     row?.fibra_status && row?.fibreSelected && <Chip
                       size="small"
-                      sx={{ minWidth: '100px' }}
+                      sx={{
+                        minWidth: '100px',
+                        backgroundColor: setStatusIconsColors(row?.fibra_status),
+                        color: 'white'
+                      }}
                       label={setStatusLabel(row?.fibra_status)}
-                      color={setStatusColors(row?.fibra_status)}
                     />
                   }
                 </TableCell>
                 <TableCell>
-                  <IconButton
-                    onClick={() => handleEdit(row.id)}
-                    aria-label="edit"
-                    size="small"
-                  >
-                    <EditIcon />
-                  </IconButton>
 
-                  <IconButton
-                    onClick={() => handleDelete(row)}
-                    aria-label="delte"
-                    size="small"
-                  >
-                    <DeleteForeverIcon />
-                  </IconButton>
+                  {
+                    isAbleToEditClientRows({
+                      customer: row,
+                      role
+                    }) ?
+                      <>
+                        <IconButton
+                          onClick={() => handleEdit(row.id)}
+                          aria-label="edit"
+                          size="small"
+                        >
+                          <EditIcon />
+                        </IconButton>
+
+                        <IconButton
+                          onClick={() => handleDelete(row)}
+                          aria-label="delte"
+                          size="small"
+                        >
+                          <DeleteForeverIcon />
+                        </IconButton>
+                      </>
+                      : <>
+                        <IconButton
+                          onClick={() => handleEdit(row.id)}
+                          aria-label="delte"
+                          size="small"
+                        >
+                          <Visibility />
+                        </IconButton>
+                      </>
+                  }
                 </TableCell>
               </TableRow>
             )}
