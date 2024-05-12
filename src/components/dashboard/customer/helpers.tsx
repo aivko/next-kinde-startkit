@@ -17,7 +17,7 @@ export const Transition = React.forwardRef(function Transition(
 });
 
 // const italyIBANRegex = /[a-zA-Z0-9]{2}\s?([a-zA-Z]{1})([0-9]{3}\s?)([0-9]{4}\s?){1}([0-9]{3})([a-zA-Z0-9]{1}\s?)([a-zA-Z0-9]{4}\s?){2}([a-zA-Z0-9]{3})\s?/;
-const italyIBANRegex = /^IT[0-9]{2}[A-Z]{1}[0-9]{5}[0-9]{5}[A-Z0-9]{12}$/;
+const italyIBANRegex = /^IT[0-9]{2}[A-Z0-9]{1}[0-9]{5}[0-9]{5}[A-Z0-9]{12}$/;
 
 export interface FormData {
   email: string;
@@ -43,12 +43,17 @@ export interface FormData {
   pgr: string;
   pod_transfer: string;
   pdr_transfer: string;
+  postalBulletin: boolean;
+  fiberMobileNumber: string;
 }
 
 export const validationSchema = Yup.object().shape({
   email: Yup.string().email().required('L\'e-mail è obbligatoria'),
   vat: Yup.string().required('E\' richiesta l\'IVA'),
-  iban: Yup.string().matches(italyIBANRegex, 'IBAN non valido, esempio "IT60X0542811101000000123456"').required('È richiesto l\'IBAN'),
+  iban: Yup.string().when([], ([], schema, values) => {
+    const { value } = values;
+    return value.length === 0 ? schema : schema.matches(italyIBANRegex, 'IBAN non valido, esempio "IT60X0542811101000000123456"').required('È richiesto l\'IBAN');
+  }),
   firstName: Yup.string().required('Il nome del proprietario è obbligatorio'),
   companyName: Yup.string().required('Nome azienda/Cognome è obbligatorio'),
   operationAddress: Yup.string().required('È obbligatorio l\'indirizzo di fornitura completo di numero civico'),
@@ -66,6 +71,10 @@ export const validationSchema = Yup.object().shape({
   phoneNumber: Yup.string().when([], ([], schema, values) => {
     const { value } = values;
     return value.length === 0 ? schema : schema.min(10, 'Il numero di telefono ha una lunghezza minima di 10 cifre');
+  }),
+  postalBulletin: Yup.boolean().when(['iban'], ([], schema, values) => {
+    const { iban } = values.parent;
+    return iban.length === 0 ? schema.required('Il campo è obbligatorio perché il campo l\'IBAN è vuoto') : schema;
   }),
   pod_transfer: Yup.string(),
   pdr_transfer: Yup.string(),
@@ -91,6 +100,15 @@ export const validationSchema = Yup.object().shape({
     if (gasSelected[0] === true) {
       const { value } = values;
       return value.length === 0 ? schema.required('Il campo è obbligatorio') : schema.min(14, 'Il campo ha una lunghezza minima di 14 cifre');
+    }
+    return schema;
+  }),
+  fiberMobileNumber: Yup.string().when(['fibreSelected', 'fibra_transfer'], ([], schema, values) => {
+    const { fibreSelected, fibra_transfer } = values.parent;
+    const { value } = values;
+
+    if (fibreSelected && fibra_transfer === 'fibra_mnp') {
+      return value.length === 0 ? schema.required('Il numero di cellulare è obbligatorio') : schema.min(10, 'Il numero di cellulare ha una lunghezza minima di 10 cifre');
     }
     return schema;
   }),

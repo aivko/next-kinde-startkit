@@ -70,4 +70,6 @@ model Customer {
   pdr_status          String   @default("")
   fibra_status        String   @default("")
   fibra_transfer      String   @default("")
+  postalBulletin      Boolean  @default(false)
+  fiberMobileNumber   String   @default("")
 }

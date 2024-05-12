@@ -1,3 +1,5 @@
+import { red, green, grey, blue, orange } from '@mui/material/colors';
+
 export const LABEL_STATUSES = {
   submitted: 'Inviato',
   progress: 'In lavorazione',
@@ -15,11 +17,11 @@ export const LABEL_COLORS = {
 }
 
 export const LABEL_BG_COLORS = {
-  submitted: 'rgba(0, 0, 0, 0.08)',
-  progress: '#635bff',
-  accepted: '#15b79f',
-  rejected: '#f04438',
-  activate: '#32383e',
+  submitted: grey[500],
+  progress: orange[500],
+  accepted: green[500],
+  rejected: red[500],
+  activate: blue[500],
 }
 
 export const setStatusLabel = (status: string) => {
