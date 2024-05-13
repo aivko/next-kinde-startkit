@@ -46,8 +46,8 @@ export function SideNav(): React.JSX.Element {
       }}
     >
       <Stack spacing={2} sx={{ p: 2 }}>
-        <Box component={RouterLink} href={paths.home} sx={{ display: 'inline-flex' }}>
-          <span className="text-display-3">Officine del futuro</span>
+        <Box component={RouterLink} href={paths.home} sx={{ display: 'inline-flex', justifyContent: 'center' }}>
+          <img className="logo-company" src="/assets/new_logo.png" alt="" />
         </Box>
       </Stack>
       <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />
@@ -56,7 +56,11 @@ export function SideNav(): React.JSX.Element {
       </Box>
       <Box sx={{ pb: '12px', textAlign: 'center' }}>
         <small className="text-subtle">
-          © {new Date().getFullYear()}. All rights reserved
+          © {new Date().getFullYear()}. All rights reserved MT INNOVA SRL
+        </small>
+        <br/>
+        <small className="text-subtle">
+          per i contatti: <a href="mailto:info@officinefuturo.it">info@officinefuturo.it</a>
         </small>
       </Box>
       <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />

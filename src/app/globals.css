@@ -58,9 +58,18 @@ a {
 }
 
 .text-subtle {
-  color: var(--g-color-grey-600);
+  color: #ffffff;
   font-size: var(--g-font-size-x-small);
   font-weight: var(--g-font-weight-base);
+}
+
+.text-subtle a {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.text-subtle a:hover {
+  text-decoration: none;
 }
 
 .text-body-1 {
@@ -227,4 +236,11 @@ a {
 
 aside {
   display: none;
+}
+
+.logo-company {
+  display: block;
+  max-width: 120px;
+  width: 100%;
+  height: auto;
 }
