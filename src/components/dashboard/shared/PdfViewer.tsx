@@ -1,7 +1,16 @@
 "use client";
 
 import React from "react";
-import { Document, Page, PDFViewer } from "@react-pdf/renderer";
+import { Document, Page } from "@react-pdf/renderer";
+import dynamic from "next/dynamic";
+
+const PDFViewer = dynamic(
+  () => import("@react-pdf/renderer").then((mod) => mod.PDFViewer),
+  {
+    ssr: false,
+    loading: () => <p>...</p>,
+  },
+);
 
 export default function PdfViewer({ pdfUrl }) {
   return (
