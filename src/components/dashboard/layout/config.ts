@@ -2,9 +2,7 @@ import { paths } from '@/paths';
 
 export const navItems = [
   { key: 'account', title: 'Agenzia', href: paths.dashboard.account, icon: 'user' },
-  // { key: 'overview', title: 'Overview', href: paths.dashboard.overview, icon: 'chart-pie' },
   { key: 'customers', title: 'Clienti', href: paths.dashboard.customers, icon: 'users' },
-  // { key: 'integrations', title: 'Integrations', href: paths.dashboard.integrations, icon: 'plugs-connected' },
-  // { key: 'settings', title: 'Settings', href: paths.dashboard.settings, icon: 'gear-six' },
-  // { key: 'error', title: 'Error', href: paths.errors.notFound, icon: 'x-square' },
+  { key: 'about', title: 'Chi siamo', href: paths.dashboard.about, icon: 'info' },
+  { key: 'information', title: 'Info & Prezzi', href: paths.dashboard.information, icon: 'coins' },
 ];
