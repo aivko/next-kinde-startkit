@@ -76,14 +76,14 @@ export function UserPopover({ anchorEl, onClose, open, user }: UserPopoverProps)
           <ListItemIcon>
             <UserIcon fontSize="var(--icon-fontSize-md)" />
           </ListItemIcon>
-          Profile
+          Profilo
         </MenuItem>
         <MenuItem>
           <LogoutLink>
             <ListItemIcon>
               <SignOutIcon fontSize="var(--icon-fontSize-md)" />
             </ListItemIcon>
-            Sign out
+            Uscire
           </LogoutLink>
         </MenuItem>
       </MenuList>

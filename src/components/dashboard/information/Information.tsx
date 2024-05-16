@@ -8,7 +8,7 @@ const pdfUrl = 'https://ik.imagekit.io/gjo0mtzlyq/pdf/COMPARATIVA_PREZZI_MAGGIO_
 export default function Information () {
   return (
     <>
-      <Typography mb={2} variant="h4">Info comparativa prezzi / provvigioni</Typography>
+      <Typography mb={2} variant="h4">Comparazione tariffe - provvigioni</Typography>
       <PdfViewer pdfUrl={pdfUrl} />
     </>
   );
