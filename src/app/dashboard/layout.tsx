@@ -26,10 +26,11 @@ export default async function RootLayout({
 }) {
   const { getUser } = getKindeServerSession();
   const user = await getUser();
+  let admin = null;
 
   if (user && user?.id) {
     const { id, email = '' } = user;
-    const admin = await getAdminById(id);
+    admin = await getAdminById(id);
     if (!admin) {
       await prisma.admins.create({
         data: {
@@ -67,7 +68,7 @@ export default async function RootLayout({
           minHeight: '100%',
         }}
       >
-        <SideNav />
+        <SideNav admin={admin} />
         <Box sx={{ display: 'flex', flex: '1 1 auto', flexDirection: 'column', pl: { lg: 'var(--SideNav-width)' } }}>
           <MainNav user={user}/>
           <main>
