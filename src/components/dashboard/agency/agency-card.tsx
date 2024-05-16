@@ -43,6 +43,12 @@ export const AgencyCard: FC<AccountInfoProps> = ({ adminInfo, handleFormEditing 
   const [agencies, setAgencies] = useState< []>([]);
 
   useEffect(() => {
+    if (!adminInfo.isVerified) {
+      handleFormEditing()
+    }
+  }, []);
+
+  useEffect(() => {
     if (adminInfo.role === 'super_admin') {
       fetchAgencies()
         .then(res => setAgencies(res.data));

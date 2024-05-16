@@ -13,9 +13,19 @@ import { paths } from '@/paths';
 import { isNavItemActive } from '@/lib/is-nav-item-active';
 import { navItems } from './config';
 import { navIcons } from './nav-icons';
+import { useEffect, useState } from "react";
+import { useCookies } from 'react-cookie';
 
-export function SideNav(): React.JSX.Element {
+export function SideNav({ admin }): React.JSX.Element {
   const pathname = usePathname();
+  const [isVerified, setIsVerified] = useState<boolean>(false);
+  const [cookies, setCookie] = useCookies(['isVerified']);
+
+  useEffect(() => {
+    const status = admin.isVerified;
+    setIsVerified(status);
+    setCookie('isVerified', status.toString());
+  }, []);
 
   return (
     <Box
@@ -52,7 +62,9 @@ export function SideNav(): React.JSX.Element {
       </Stack>
       <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />
       <Box component="nav" sx={{ flex: '1 1 auto', p: '12px' }}>
-        {renderNavItems({ pathname, items: navItems })}
+        {
+          renderNavItems({ pathname, items: navItems, isNotVerified: (!isVerified && !cookies.isVerified) })
+        }
       </Box>
       <Box sx={{ pb: '12px', textAlign: 'center' }}>
         <small className="text-subtle">
@@ -68,11 +80,11 @@ export function SideNav(): React.JSX.Element {
   );
 }
 
-function renderNavItems({ items = [], pathname }: { items?: NavItemConfig[]; pathname: string }): React.JSX.Element {
+function renderNavItems({ items = [], pathname, isNotVerified }: { items?: NavItemConfig[]; pathname: string; isNotVerified: boolean}): React.JSX.Element {
   const children = items.reduce((acc: React.ReactNode[], curr: NavItemConfig): React.ReactNode[] => {
     const { key, ...item } = curr;
 
-    acc.push(<NavItem key={key} pathname={pathname} {...item} />);
+    acc.push(<NavItem disabled={isNotVerified} key={key} pathname={pathname} {...item} isNotVerified={isNotVerified} />);
 
     return acc;
   }, []);
@@ -88,7 +100,7 @@ interface NavItemProps extends Omit<NavItemConfig, 'items'> {
   pathname: string;
 }
 
-function NavItem({ disabled, external, href, icon, matcher, pathname, title }: NavItemProps): React.JSX.Element {
+function NavItem({ disabled, external, href, icon, matcher, pathname, title, isNotVerified }: NavItemProps): React.JSX.Element {
   const active = isNavItemActive({ disabled, external, href, matcher, pathname });
   const Icon = icon ? navIcons[icon] : null;
 
@@ -97,8 +109,10 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title }: N
       <Box
         {...(href
           ? {
+
+              disabled: isNotVerified,
               component: external ? 'a' : RouterLink,
-              href,
+              href: isNotVerified ? '' : href,
               target: external ? '_blank' : undefined,
               rel: external ? 'noreferrer' : undefined,
             }
