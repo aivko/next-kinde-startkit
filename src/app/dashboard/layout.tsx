@@ -70,7 +70,7 @@ export default async function RootLayout({
       >
         <SideNav admin={admin} />
         <Box sx={{ display: 'flex', flex: '1 1 auto', flexDirection: 'column', pl: { lg: 'var(--SideNav-width)' } }}>
-          <MainNav user={user}/>
+          <MainNav user={user} admin={admin}/>
           <main>
             {children}
           </main>
