@@ -109,8 +109,6 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title, isN
       <Box
         {...(href
           ? {
-
-              disabled: isNotVerified,
               component: external ? 'a' : RouterLink,
               href: isNotVerified ? '' : href,
               target: external ? '_blank' : undefined,
