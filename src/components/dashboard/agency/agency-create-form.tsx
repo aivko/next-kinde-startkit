@@ -25,7 +25,7 @@ import {
 } from "@/components/dashboard/agency/constants";
 import { AgencyCard } from '@/components/dashboard/agency/agency-card';
 import CircularIndeterminate from '@/components/dashboard/shared/CircularIndeterminate';
-import { useCookies } from 'react-cookie';
+import { useLocalStorage } from 'usehooks-ts'
 
 const inputStyles = {
   "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button": {
@@ -40,7 +40,7 @@ export function AgencyCreateForm(): React.JSX.Element {
   const [adminInfo, setAdminInfo] = useState<FormData | {}>({});
   const [isFormEditing, setFormEditing] = useState<boolean>(false);
   const [isLoading, setLoading] = useState<boolean>(true);
-  const [cookies, setCookie, removeCookie] = useCookies(['isVerified']);
+  const [localStorage, setLocalStorage, removeLocalStorage] = useLocalStorage('isVerified', false);
 
   const { register, handleSubmit, formState: { errors }, setValue } = useForm<FormData>({
     resolver: yupResolver(validationSchema)
@@ -83,7 +83,7 @@ export function AgencyCreateForm(): React.JSX.Element {
   };
   const onSubmit = async (data: FormData) => {
     data['isVerified'] = true;
-    setCookie('isVerified', "true");
+    setLocalStorage(true);
     await updateAdmin({ data: data })
       .then(res => {
         setAdminInfo(res.data)

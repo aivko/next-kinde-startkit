@@ -16,7 +16,7 @@ import { isNavItemActive } from '@/lib/is-nav-item-active';
 import { navItems } from './config';
 import { navIcons } from './nav-icons';
 
-import { useCookies } from 'react-cookie';
+import { useLocalStorage } from 'usehooks-ts'
 import { useEffect, useState } from "react";
 
 export interface MobileNavProps {
@@ -29,12 +29,12 @@ export interface MobileNavProps {
 export function MobileNav({ open, onClose, admin }: MobileNavProps): React.JSX.Element {
   const pathname = usePathname();
   const [isVerified, setIsVerified] = useState<boolean>(false);
-  const [cookies, setCookie] = useCookies(['isVerified']);
+  const [localStorage, setLocalStorage, removeLocalStorage] = useLocalStorage('isVerified', false);
 
   useEffect(() => {
     const status = admin.isVerified;
     setIsVerified(status);
-    setCookie('isVerified', status.toString());
+    setLocalStorage(status);
   }, []);
 
   return (
@@ -73,7 +73,7 @@ export function MobileNav({ open, onClose, admin }: MobileNavProps): React.JSX.E
       <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />
       <Box component="nav" sx={{ flex: '1 1 auto', p: '12px' }}>
         {
-          renderNavItems({ pathname, items: navItems, isNotVerified: (!isVerified && !cookies.isVerified) })
+          renderNavItems({ pathname, items: navItems, isNotVerified: (!isVerified && !localStorage) })
         }
       </Box>
       <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />

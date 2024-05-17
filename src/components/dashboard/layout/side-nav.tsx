@@ -14,17 +14,17 @@ import { isNavItemActive } from '@/lib/is-nav-item-active';
 import { navItems } from './config';
 import { navIcons } from './nav-icons';
 import { useEffect, useState } from "react";
-import { useCookies } from 'react-cookie';
+import { useLocalStorage } from 'usehooks-ts';
 
 export function SideNav({ admin }): React.JSX.Element {
   const pathname = usePathname();
   const [isVerified, setIsVerified] = useState<boolean>(false);
-  const [cookies, setCookie] = useCookies(['isVerified']);
+  const [localStorage, setLocalStorage, removeLocalStorage] = useLocalStorage('isVerified', false);
 
   useEffect(() => {
     const status = admin.isVerified;
     setIsVerified(status);
-    setCookie('isVerified', status.toString());
+    setLocalStorage(status);
   }, []);
 
   return (
@@ -63,7 +63,7 @@ export function SideNav({ admin }): React.JSX.Element {
       <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />
       <Box component="nav" sx={{ flex: '1 1 auto', p: '12px' }}>
         {
-          renderNavItems({ pathname, items: navItems, isNotVerified: (!isVerified && !cookies.isVerified) })
+          renderNavItems({ pathname, items: navItems, isNotVerified: (!isVerified && !localStorage) })
         }
       </Box>
       <Box sx={{ pb: '12px', textAlign: 'center' }}>
