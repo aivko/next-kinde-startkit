@@ -35,7 +35,6 @@
     "react-dom": "18.2.0",
     "react-hook-form": "^7.51.1",
     "typescript": "5.3.3",
-    "usehooks-ts": "^3.1.0",
     "yup": "^1.4.0"
   },
   "devDependencies": {

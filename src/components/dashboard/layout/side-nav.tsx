@@ -13,19 +13,9 @@ import { paths } from '@/paths';
 import { isNavItemActive } from '@/lib/is-nav-item-active';
 import { navItems } from './config';
 import { navIcons } from './nav-icons';
-import { useEffect, useState } from "react";
-import { useLocalStorage } from 'usehooks-ts';
 
 export function SideNav({ admin }): React.JSX.Element {
   const pathname = usePathname();
-  const [isVerified, setIsVerified] = useState<boolean>(false);
-  const [localStorage, setLocalStorage, removeLocalStorage] = useLocalStorage('isVerified', false);
-
-  useEffect(() => {
-    const status = admin.isVerified;
-    setIsVerified(status);
-    setLocalStorage(status);
-  }, []);
 
   return (
     <Box
@@ -63,7 +53,7 @@ export function SideNav({ admin }): React.JSX.Element {
       <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />
       <Box component="nav" sx={{ flex: '1 1 auto', p: '12px' }}>
         {
-          renderNavItems({ pathname, items: navItems, isNotVerified: (!isVerified && !localStorage) })
+          renderNavItems({ pathname, items: navItems })
         }
       </Box>
       <Box sx={{ pb: '12px', textAlign: 'center' }}>
@@ -80,11 +70,11 @@ export function SideNav({ admin }): React.JSX.Element {
   );
 }
 
-function renderNavItems({ items = [], pathname, isNotVerified }: { items?: NavItemConfig[]; pathname: string; isNotVerified: boolean}): React.JSX.Element {
+function renderNavItems({ items = [], pathname }: { items?: NavItemConfig[]; pathname: string; }): React.JSX.Element {
   const children = items.reduce((acc: React.ReactNode[], curr: NavItemConfig): React.ReactNode[] => {
     const { key, ...item } = curr;
 
-    acc.push(<NavItem disabled={isNotVerified} key={key} pathname={pathname} {...item} isNotVerified={isNotVerified} />);
+    acc.push(<NavItem key={key} pathname={pathname} {...item} />);
 
     return acc;
   }, []);
@@ -100,7 +90,7 @@ interface NavItemProps extends Omit<NavItemConfig, 'items'> {
   pathname: string;
 }
 
-function NavItem({ disabled, external, href, icon, matcher, pathname, title, isNotVerified }: NavItemProps): React.JSX.Element {
+function NavItem({ external, href, icon, matcher, pathname, title, disabled }: NavItemProps): React.JSX.Element {
   const active = isNavItemActive({ disabled, external, href, matcher, pathname });
   const Icon = icon ? navIcons[icon] : null;
 
@@ -110,7 +100,7 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title, isN
         {...(href
           ? {
               component: external ? 'a' : RouterLink,
-              href: isNotVerified ? '' : href,
+              href: href,
               target: external ? '_blank' : undefined,
               rel: external ? 'noreferrer' : undefined,
             }

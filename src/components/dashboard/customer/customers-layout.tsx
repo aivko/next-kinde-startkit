@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useState, createContext, useContext } from 'react';
+import React, { useState, createContext, useContext, useEffect } from "react";
 import { CustomersFilters } from '@/components/dashboard/customer/customers-filters';
 import { CustomersTable } from '@/components/dashboard/customer/customers-table';
+import { fetchAdmin } from "@/components/dashboard/agency/api";
+import { useRouter } from "next/navigation";
 
 interface Customer {
   vat:string,
@@ -50,6 +52,7 @@ export function CustomersLayout(): React.ReactElement {
   const [customersContext, setCustomersContext] = useState<Array<any>>([]);
   const [customerContext, setCustomerContext] = useState<Customer | undefined>(undefined);
   const [isModalOpenContext, setModalOpenContext] = useState<boolean>(false);
+  const router = useRouter()
 
   const contextValue: ClientContextType = {
     customersContext,
@@ -59,6 +62,23 @@ export function CustomersLayout(): React.ReactElement {
     isModalOpenContext,
     setModalOpenContext
   };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const res = await fetchAdmin();
+      if (!res.data.isVerified) {
+        router.push("/dashboard/account");
+      }
+    } catch (error) {
+      console.error('Error fetching profile data:', error);
+    }
+  };
+
+  console.log(customerContext)
 
   return (
     <ClientContext.Provider value={contextValue}>

@@ -16,26 +16,14 @@ import { isNavItemActive } from '@/lib/is-nav-item-active';
 import { navItems } from './config';
 import { navIcons } from './nav-icons';
 
-import { useLocalStorage } from 'usehooks-ts'
-import { useEffect, useState } from "react";
-
 export interface MobileNavProps {
   onClose?: () => void;
   open: boolean;
   items?: NavItemConfig[];
-  admin: any;
 }
 
-export function MobileNav({ open, onClose, admin }: MobileNavProps): React.JSX.Element {
+export function MobileNav({ open, onClose }: MobileNavProps): React.JSX.Element {
   const pathname = usePathname();
-  const [isVerified, setIsVerified] = useState<boolean>(false);
-  const [localStorage, setLocalStorage, removeLocalStorage] = useLocalStorage('isVerified', false);
-
-  useEffect(() => {
-    const status = admin.isVerified;
-    setIsVerified(status);
-    setLocalStorage(status);
-  }, []);
 
   return (
     <Drawer
@@ -73,7 +61,7 @@ export function MobileNav({ open, onClose, admin }: MobileNavProps): React.JSX.E
       <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />
       <Box component="nav" sx={{ flex: '1 1 auto', p: '12px' }}>
         {
-          renderNavItems({ pathname, items: navItems, isNotVerified: (!isVerified && !localStorage) })
+          renderNavItems({ pathname, items: navItems })
         }
       </Box>
       <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />
@@ -81,16 +69,14 @@ export function MobileNav({ open, onClose, admin }: MobileNavProps): React.JSX.E
   );
 }
 
-function renderNavItems({ items = [], pathname, isNotVerified }: { items?: NavItemConfig[]; pathname: string, isNotVerified: boolean }): React.JSX.Element {
+function renderNavItems({ items = [], pathname }: { items?: NavItemConfig[]; pathname: string }): React.JSX.Element {
   const children = items.reduce((acc: React.ReactNode[], curr: NavItemConfig): React.ReactNode[] => {
     const { key, ...item } = curr;
 
     acc.push(<NavItem
       key={key}
-      disabled={isNotVerified}
       pathname={pathname}
       {...item}
-      isNotVerified={isNotVerified}
     />);
 
     return acc;

@@ -11,7 +11,7 @@ import { usePopover } from '@/hooks/use-popover';
 import { MobileNav } from './mobile-nav';
 import { UserPopover } from './user-popover';
 
-export function MainNav({ user, admin }: any): React.JSX.Element {
+export function MainNav({ user }: any): React.JSX.Element {
   const [openNav, setOpenNav] = React.useState<boolean>(false);
   const pathname = usePathname();
   const userPopover = usePopover<HTMLDivElement>();
@@ -59,7 +59,6 @@ export function MainNav({ user, admin }: any): React.JSX.Element {
       </Box>
       <UserPopover user={user} anchorEl={userPopover.anchorRef.current} onClose={userPopover.handleClose} open={userPopover.open} />
       <MobileNav
-        admin={admin}
         onClose={() => {
           setOpenNav(false);
         }}
