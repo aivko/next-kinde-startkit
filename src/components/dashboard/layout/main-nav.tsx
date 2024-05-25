@@ -29,7 +29,7 @@ export function MainNav({ user }: any): React.JSX.Element {
           backgroundColor: 'var(--mui-palette-background-paper)',
           position: 'sticky',
           top: 0,
-          zIndex: 'var(--mui-zIndex-appBar)',
+          zIndex: '100',
         }}
       >
         <Stack
