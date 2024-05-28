@@ -42,10 +42,11 @@ export function SideNav({ admin }): React.JSX.Element {
         top: 0,
         width: 'var(--SideNav-width)',
         zIndex: 'var(--SideNav-zIndex)',
+        boxShadow: '10px 0px 5px -3px rgba(0, 0, 0, 0.04)',
         '&::-webkit-scrollbar': { display: 'none' },
       }}
     >
-      <Stack spacing={2} sx={{ p: 2 }}>
+      <Stack spacing={2} sx={{ p: 2, backgroundColor: '#fff' }}>
         <Box component={RouterLink} href={paths.home} sx={{ display: 'inline-flex', justifyContent: 'center' }}>
           <img className="logo-company" src="/assets/new_logo.png" alt="" />
         </Box>
