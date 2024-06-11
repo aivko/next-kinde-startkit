@@ -7,6 +7,7 @@ import { PrismaClient } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { MainNav } from "@/components/dashboard/layout/main-nav";
 import { SideNav } from "@/components/dashboard/layout/side-nav";
+import CookiesBanner from "@/components/dashboard/shared/CookieBanner";
 const prisma = new PrismaClient();
 
 async function getAdminById(id: string) {
@@ -38,6 +39,7 @@ export default async function RootLayout({
           email,
           isVerified: false,
           isVerifiedBySA: false,
+          isTosAccepted: false
         }
       });
 
@@ -72,7 +74,10 @@ export default async function RootLayout({
         <Box sx={{ display: 'flex', flex: '1 1 auto', flexDirection: 'column', pl: { lg: 'var(--SideNav-width)' } }}>
           <MainNav user={user} admin={admin}/>
           <main>
-            {children}
+            { children }
+            {
+              !admin?.isTosAccepted && <CookiesBanner admin={admin} />
+            }
           </main>
         </Box>
       </Box>
