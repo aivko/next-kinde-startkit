@@ -1,8 +1,6 @@
 import * as React from 'react';
 import RouterLink from 'next/link';
-import {
-  LogoutLink,
-} from "@kinde-oss/kinde-auth-nextjs/components";
+import { LogoutLink } from "@kinde-oss/kinde-auth-nextjs/components";
 import { useRouter } from 'next/navigation';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';

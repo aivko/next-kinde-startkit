@@ -55,7 +55,7 @@ export function MobileNav({ open, onClose }: MobileNavProps): React.JSX.Element 
     >
       <Stack spacing={2} sx={{ p: 2, backgroundColor: '#fff' }}>
         <Box component={RouterLink} href={paths.home} sx={{ display: 'inline-flex', justifyContent: 'center' }}>
-          <img className="logo-company" src="/assets/new_logo.png" alt="" />
+          <img className="logo-company" src="/assets/new_logo.jpeg" alt="" />
         </Box>
       </Stack>
       <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />

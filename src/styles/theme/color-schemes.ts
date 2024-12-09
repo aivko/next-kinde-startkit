@@ -10,7 +10,8 @@ export const colorSchemes = {
       background: {
         default: 'var(--mui-palette-neutral-950)',
         defaultChannel: '9 10 11',
-        paper: 'var(--mui-palette-neutral-900)',
+        // paper: 'var(--mui-palette-neutral-900)',
+        paper: stormGrey[200],
         level1: 'var(--mui-palette-neutral-800)',
         level2: 'var(--mui-palette-neutral-700)',
         level3: 'var(--mui-palette-neutral-600)',
