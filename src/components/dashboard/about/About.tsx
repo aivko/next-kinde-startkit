@@ -10,11 +10,13 @@ import Button from "@mui/material/Button";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import {IKContext, IKUpload} from "imagekitio-react";
 import {hiddenInputStyles} from "@/components/dashboard/customer/helpers";
+import Snackbar from "@mui/material/Snackbar";
 const pdfUrl = 'https://ik.imagekit.io/gjo0mtzlyq/pdf/CHI_SIAMO.pdf';
 
 export default function About () {
     const [ role, setRole ] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
+    const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
 
     const onErrorIKU = (error) => {
         setLoading(false);
@@ -23,6 +25,7 @@ export default function About () {
     const onSuccessIKU = (res: { url: any; }) => {
         setLoading(false);
         purgeCache(res?.url);
+        setSnackbarOpen(true);
     };
 
     useEffect(() => {
@@ -32,7 +35,7 @@ export default function About () {
     }, []);
   return (
     <>
-      <div>
+        <div>
           <Typography mb={2} variant="h4">Chi siamo</Typography>
           {
               role === 'super_admin' && (
@@ -68,9 +71,16 @@ export default function About () {
                   </Box>
               )
           }
-      </div>
+        </div>
 
-      <PdfViewer pdfUrl={pdfUrl} />
+        <PdfViewer pdfUrl={pdfUrl} />
+
+        <Snackbar
+            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+            open={snackbarOpen}
+            autoHideDuration={5000}
+            message="La cache per il pdf verrà aggiornata tra 5 e 10 minuti"
+        />
     </>
   );
 };

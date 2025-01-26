@@ -11,10 +11,12 @@ import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 const pdfUrl = 'https://ik.imagekit.io/gjo0mtzlyq/pdf/COMPARATIVA_PREZZI_DICEMBRE.pdf';
 import { authenticator, purgeCache } from '@/helpers/imagekit';
+import Snackbar from '@mui/material/Snackbar';
 
 export default function Information () {
-    const [ role, setRole ] = useState<string>('');
+    const [role, setRole] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
+    const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
 
     const onErrorIKU = (error) => {
         setLoading(false);
@@ -23,6 +25,7 @@ export default function Information () {
     const onSuccessIKU = (res: { url: any; }) => {
         setLoading(false);
         purgeCache(res?.url);
+        setSnackbarOpen(true);
     };
 
     useEffect(() => {
@@ -33,7 +36,7 @@ export default function Information () {
 
   return (
     <>
-      <div>
+        <div>
           <Typography mb={2} variant="h4">Comparazione tariffe - provvigioni</Typography>
           {
               role === 'super_admin' && (
@@ -69,9 +72,16 @@ export default function Information () {
                   </Box>
               )
           }
-      </div>
+        </div>
 
-      <PdfViewer pdfUrl={pdfUrl} />
+        <PdfViewer pdfUrl={pdfUrl} />
+
+        <Snackbar
+            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+            open={snackbarOpen}
+            autoHideDuration={5000}
+            message="La cache per il pdf verrà aggiornata tra 5 e 10 minuti"
+        />
     </>
   );
 };
