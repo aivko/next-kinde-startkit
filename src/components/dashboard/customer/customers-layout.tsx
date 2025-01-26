@@ -78,8 +78,6 @@ export function CustomersLayout(): React.ReactElement {
     }
   };
 
-  console.log(customerContext)
-
   return (
     <ClientContext.Provider value={contextValue}>
       <>
