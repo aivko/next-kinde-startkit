@@ -9,7 +9,7 @@ import {IKContext, IKUpload} from "imagekitio-react";
 import {hiddenInputStyles} from "@/components/dashboard/customer/helpers";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
-const pdfUrl = 'https://ik.imagekit.io/gjo0mtzlyq/pdf/COMPARATIVA_PREZZI_DICEMBRE.pdf';
+const pdfUrl = `https://ik.imagekit.io/gjo0mtzlyq/pdf/COMPARATIVA_PREZZI_DICEMBRE.pdf?${Date.now()}`;
 import { authenticator, purgeCache } from '@/helpers/imagekit';
 import Snackbar from '@mui/material/Snackbar';
 
@@ -21,6 +21,10 @@ export default function Information () {
     const onErrorIKU = (error) => {
         setLoading(false);
     };
+
+    const handleCloseSnackbar = () => {
+        setSnackbarOpen(false);
+    }
 
     const onSuccessIKU = (res: { url: any; }) => {
         setLoading(false);
@@ -58,7 +62,7 @@ export default function Information () {
                           >
                               <IKUpload
                                   hidden
-                                  fileName="COMPARATIVA_PREZZI_DICEMBRE_TEST.pdf"
+                                  fileName="COMPARATIVA_PREZZI_DICEMBRE.pdf"
                                   useUniqueFileName={false}
                                   folder={"/pdf"}
                                   onError={onErrorIKU}
@@ -80,6 +84,7 @@ export default function Information () {
             anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
             open={snackbarOpen}
             autoHideDuration={5000}
+            onClose={handleCloseSnackbar}
             message="La cache per il pdf verrà aggiornata tra 5 e 10 minuti"
         />
     </>

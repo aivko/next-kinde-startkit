@@ -11,7 +11,7 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import {IKContext, IKUpload} from "imagekitio-react";
 import {hiddenInputStyles} from "@/components/dashboard/customer/helpers";
 import Snackbar from "@mui/material/Snackbar";
-const pdfUrl = 'https://ik.imagekit.io/gjo0mtzlyq/pdf/CHI_SIAMO.pdf';
+const pdfUrl = `https://ik.imagekit.io/gjo0mtzlyq/pdf/CHI_SIAMO.pdf?${Date.now()}`;
 
 export default function About () {
     const [ role, setRole ] = useState<string>('');
@@ -21,6 +21,10 @@ export default function About () {
     const onErrorIKU = (error) => {
         setLoading(false);
     };
+
+    const handleCloseSnackbar = () => {
+        setSnackbarOpen(false);
+    }
 
     const onSuccessIKU = (res: { url: any; }) => {
         setLoading(false);
@@ -79,6 +83,7 @@ export default function About () {
             anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
             open={snackbarOpen}
             autoHideDuration={5000}
+            onClose={handleCloseSnackbar}
             message="La cache per il pdf verrà aggiornata tra 5 e 10 minuti"
         />
     </>
