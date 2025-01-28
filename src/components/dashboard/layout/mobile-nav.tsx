@@ -30,7 +30,7 @@ export function MobileNav({ open, onClose }: MobileNavProps): React.JSX.Element 
       PaperProps={{
         sx: {
           '--MobileNav-background': 'var(--mui-palette-neutral-950)',
-          '--MobileNav-color': 'var(--mui-palette-common-white)',
+          '--MobileNav-color': '#fff',
           '--NavItem-color': 'var(--mui-palette-neutral-300)',
           '--NavItem-hover-background': 'rgba(255, 255, 255, 0.04)',
           '--NavItem-active-background': 'var(--mui-palette-primary-main)',

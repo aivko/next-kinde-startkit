@@ -21,7 +21,7 @@ export function SideNav({ admin }): React.JSX.Element {
     <Box
       sx={{
         '--SideNav-background': 'var(--mui-palette-neutral-950)',
-        '--SideNav-color': 'var(--mui-palette-common-white)',
+        '--SideNav-color': '#fff',
         '--NavItem-color': 'var(--mui-palette-neutral-300)',
         '--NavItem-hover-background': 'rgba(255, 255, 255, 0.04)',
         '--NavItem-active-background': 'var(--mui-palette-primary-main)',
