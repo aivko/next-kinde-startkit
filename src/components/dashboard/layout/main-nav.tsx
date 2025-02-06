@@ -52,7 +52,7 @@ export function MainNav({ user }: any): React.JSX.Element {
               onClick={userPopover.handleOpen}
               ref={userPopover.anchorRef}
               src={user?.picture ? user?.picture : '/assets/avatar.png'}
-              sx={{ cursor: 'pointer' }}
+              sx={{ cursor: 'pointer', backgroundColor: '#7700C4' }}
             />
           </Stack>
         </Stack>
