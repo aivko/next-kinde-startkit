@@ -31,9 +31,9 @@ export function MobileNav({ open, onClose }: MobileNavProps): React.JSX.Element 
         sx: {
           '--MobileNav-background': 'var(--mui-palette-neutral-950)',
           '--MobileNav-color': '#fff',
-          '--NavItem-color': 'var(--mui-palette-neutral-300)',
-          '--NavItem-hover-background': 'rgba(255, 255, 255, 0.04)',
-          '--NavItem-active-background': 'var(--mui-palette-primary-main)',
+          '--NavItem-color': '#fff',
+          '--NavItem-hover-background': '#1A1A1A',
+          '--NavItem-active-background': '#0F0F0F',
           '--NavItem-active-color': 'var(--mui-palette-primary-contrastText)',
           '--NavItem-disabled-color': 'var(--mui-palette-neutral-500)',
           '--NavItem-icon-color': 'var(--mui-palette-neutral-400)',

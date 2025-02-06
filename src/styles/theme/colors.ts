@@ -34,7 +34,7 @@ export const neonBlue = {
   200: '#c2cbff',
   300: '#9ca7ff',
   400: '#7578ff',
-  500: '#0638EA', // default #635bff
+  500: '#7700C4', // default #635bff
   600: '#635bff', // hover #4e36f5
   700: '#432ad8',
   800: '#3725ae',
@@ -95,5 +95,5 @@ export const stormGrey = {
   700: '#434a60',
   800: '#313749',
   900: '#212636',
-  950: '#121621',
+  950: '#7700C4', //#121621
 } satisfies PaletteRange;
