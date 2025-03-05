@@ -86,6 +86,7 @@ export default function AgencyTable({ agencies, adminInfo }) {
                   customers={customers}
                   handleEditCustomer={updateCustomers}
                   handleDeleteCustomer={updateCustomers}
+                  agencyData={agency}
                 />
               </Paper>
             }
