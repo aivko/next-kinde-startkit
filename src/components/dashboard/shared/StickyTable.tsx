@@ -36,7 +36,7 @@ const columns: readonly Column[] = [
   { id: 'action', label: 'Azioni' },
 ];
 
-export default function StickyTable({ customers, handleEditCustomer, handleDeleteCustomer }) {
+export default function StickyTable({ customers, handleEditCustomer, handleDeleteCustomer, agencyData = {} }) {
   const [isDialogOpen, setDialogOpen] = React.useState<boolean>(false);
   const [isModalOpen, setModalOpen] = React.useState<boolean | false>(false);
   const [agencyClient, setAgencyClient] = React.useState<object>({});
@@ -164,6 +164,7 @@ export default function StickyTable({ customers, handleEditCustomer, handleDelet
           isModalOpen={isModalOpen}
           setCustomers={handleCustomers}
           setModalOpen={handleModal}
+          agencyData={agencyData}
         />
       }
       <Dialog

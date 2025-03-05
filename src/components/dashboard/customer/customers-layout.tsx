@@ -52,6 +52,7 @@ export function CustomersLayout(): React.ReactElement {
   const [customersContext, setCustomersContext] = useState<Array<any>>([]);
   const [customerContext, setCustomerContext] = useState<Customer | undefined>(undefined);
   const [isModalOpenContext, setModalOpenContext] = useState<boolean>(false);
+  const [agencyData, setAgencyData] = useState<Object>({});
   const router = useRouter()
 
   const contextValue: ClientContextType = {
@@ -70,6 +71,7 @@ export function CustomersLayout(): React.ReactElement {
   const fetchData = async () => {
     try {
       const res = await fetchAdmin();
+      setAgencyData(res.data);
       if (!res.data.isVerified) {
         router.push("/dashboard/account");
       }
@@ -81,8 +83,8 @@ export function CustomersLayout(): React.ReactElement {
   return (
     <ClientContext.Provider value={contextValue}>
       <>
-        <CustomersFilters />
-        <CustomersTable />
+        <CustomersFilters agencyData={agencyData} />
+        <CustomersTable agencyData={agencyData} />
       </>
     </ClientContext.Provider>
   );

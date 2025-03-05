@@ -92,7 +92,7 @@ export const validationSchema = Yup.object().shape({
   pod: Yup.string().when('electricitySelected', (electricitySelected, schema, values) => {
     if (electricitySelected[0] === true) {
       const { value } = values;
-      return value.length === 0 ? schema.required('Il campo è obbligatorio') : schema.min(14, 'Il campo ha una lunghezza minima di 14 cifre');
+      return value.length === 0 ? schema.required('Il campo è obbligatorio') : schema.matches(/^IT001E\d{8,}$/, 'Il campo ha una lunghezza minima di 14 caratteri, esempio "IT001E12345678"');
     }
     return schema;
   }),
