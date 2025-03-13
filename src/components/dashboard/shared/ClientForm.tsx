@@ -44,7 +44,6 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogActions from "@mui/material/DialogActions";
 import { isAbleToEditClientRows } from "@/components/dashboard/agency/constants";
-import { sendEmail } from "@/actions";
 
 const inputStyles = {
   "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button": {
@@ -55,7 +54,7 @@ const inputStyles = {
   },
 };
 
-export function ClientForm({ customer= {}, isModalOpen = false, customers = [], setCustomers, setModalOpen, role = '', agencyData = {} }) {
+export function ClientForm({ customer= {}, isModalOpen = false, customers = [], setCustomers, setModalOpen, role = '' }) {
   const [addedFiles, setAddedFiles] = useState<Array<any>>([]);
   const [addedFilesError, setAddedFilesError] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -174,7 +173,6 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
           setCustomers([res.data, ...customers]);
           setLoadingButton(false);
           handleClose();
-          sendEmail({ data, type: 'client', agency: agencyData });
         })
       }
     }
@@ -536,6 +534,7 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
                           <FormControl fullWidth required>
                             <TextField
                               sx={inputStyles}
+                              type="number"
                               error={Boolean(errors.pod)}
                               helperText={errors?.pod?.message}
                               label="POD *"
