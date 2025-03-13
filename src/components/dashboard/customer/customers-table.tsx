@@ -32,7 +32,7 @@ import { setStatusLabel, setStatusIconsColors } from "@/app/dashboard/helpers";
 import { Transition } from "@/components/dashboard/customer/helpers";
 import { isAbleToEditClientRows } from "@/components/dashboard/agency/constants";
 
-export function CustomersTable({ agencyData }) {
+export function CustomersTable() {
   const [isLoading, setLoading] = useState<boolean>(true);
   const [agencyId, setAgencyId] = useState<string>('');
   const [role, setRole] = useState<string>('');
@@ -264,7 +264,6 @@ export function CustomersTable({ agencyData }) {
           isModalOpen={isModalOpenContext}
           setCustomers={handleCustomers}
           setModalOpen={handleModal}
-          agencyData={agencyData}
         />
       }
     </Card>
