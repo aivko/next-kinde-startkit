@@ -3,8 +3,8 @@ import { Resend } from "resend";
 import { htmlTemplates} from '@/helpers/html-templates'
 
 const EMAIL_FROM = "onboarding@resend.dev";
-const EMAIL_TO = "info@utenzia.it";
-const RESEND_API_KEY = 're_iSXc4SPS_JqHUWmfKVVJHcRrJWbzyaAc5';
+const EMAIL_TO = "stabene20@gmail.com";
+const RESEND_API_KEY = 're_VGGGJ75C_NGM65sDJE4SPDVoYhHJCVbLc';
 
 const EMAIL_SUBJECTS = {
     agency: "Nuova registrazione dell'agenzia",
