@@ -13,6 +13,7 @@ import TextField from "@mui/material/TextField";
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+import { sendEmail } from '@/actions';
 import {
   fetchAdmin,
   updateAdmin,
@@ -79,6 +80,9 @@ export function AgencyCreateForm(): React.JSX.Element {
     }
   };
   const onSubmit = async (data: FormData) => {
+    if (!adminInfo.isVerified) {
+      await sendEmail({ data, type: 'agency' });
+    }
     data['isVerified'] = true;
     await updateAdmin({ data: data })
       .then(res => {
