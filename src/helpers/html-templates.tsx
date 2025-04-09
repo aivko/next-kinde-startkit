@@ -1,3 +1,5 @@
+const APP_URL = 'https://cheerful-sorbet-b08adf.netlify.app/dashboard/account'
+
 const agencyRegisterTemplate = ({ data }) => `
   <div style="max-width: 600px; width: 100%; margin: 20px auto; background: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); border: 1px solid #ddd;">
     <div style="background: #7700C4; color: white; text-align: center; padding: 15px; font-size: 20px; border-radius: 8px;">
@@ -28,7 +30,7 @@ const agencyRegisterTemplate = ({ data }) => `
       </table>
     </div>
     <div style="text-align: center; font-size: 14px; color: #777; padding-top: 15px; border-top: 1px solid #ddd;">
-        <strong><a href="https://cheerful-sorbet-b08adf.netlify.app/dashboard/account" style="color: #7700C4;">Area riservata</a></strong> 
+        <strong><a href="${APP_URL}" style="color: #7700C4;">Area riservata</a></strong> 
     </div>
   </div>`;
 
@@ -83,7 +85,7 @@ const clientRegisterTemplate = ({ data, agency }) => `
       </div>
     </div>
     <div style="text-align: center; font-size: 14px; color: #777; padding-top: 15px; border-top: 1px solid #ddd;">
-        <strong><a href="https://cheerful-sorbet-b08adf.netlify.app/dashboard/account" style="color: #7700C4;">Area riservata</a></strong> 
+        <strong><a href="${APP_URL}" style="color: #7700C4;">Area riservata</a></strong> 
     </div>
   </div>`;
 
