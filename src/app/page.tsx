@@ -9,5 +9,5 @@ export default async function Page() {
       redirect('/api/auth/login?post_login_redirect_url=/dashboard/account');
   }
 
-  redirect('/dashboard');
+  redirect('/dashboard/account');
 }
