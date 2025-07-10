@@ -4,7 +4,7 @@ import Grid from '@mui/material/Unstable_Grid2';
 
 import { AgencyCreateForm } from '@/components/dashboard/agency/agency-create-form';
 
-export default async function Page(): Promise<React.JSX.Element> {
+export default function Page() {
   return (
     <Stack spacing={3} p={5}>
       <Grid container spacing={3}>
