@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect } from 'react';
-import { useSearchParams } from 'next/navigation'
 import {
   AppBar,
   Toolbar,
@@ -50,10 +49,9 @@ const Footer = () => {
 }
 
 export default function Confirmation() {
-  const searchParams = useSearchParams();
-
   useEffect(() => {
-    const customer = searchParams.get('customer');
+    const params = new URLSearchParams(window.location.search);
+    const customer = params.get('customer')
     if (!customer) {
       return;
     }
