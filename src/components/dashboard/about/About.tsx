@@ -1,15 +1,17 @@
 "use client";
 
+//@ts-ignore
+
 import React, {useEffect, useState} from 'react';
-import PdfViewer from "@/components/dashboard/shared/PdfViewer";
+import PdfViewerWrapper from "../../../components/dashboard/shared/PdfViewer";
 import Typography from "@mui/material/Typography";
-import {authenticator, purgeCache} from "@/helpers/imagekit";
-import { fetchAdmin } from "@/components/dashboard/agency/api";
+import {authenticator, purgeCache} from "../../../helpers/imagekit";
+import { fetchAdmin } from "../../../components/dashboard/agency/api";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import {IKContext, IKUpload} from "imagekitio-react";
-import {hiddenInputStyles} from "@/components/dashboard/customer/helpers";
+import {hiddenInputStyles} from "../../../components/dashboard/customer/helpers";
 import Snackbar from "@mui/material/Snackbar";
 const pdfUrl = `https://ik.imagekit.io/gjo0mtzlyq/pdf/CHI_SIAMO.pdf?${Date.now()}`;
 
@@ -77,7 +79,7 @@ export default function About () {
           }
         </div>
 
-        <PdfViewer pdfUrl={pdfUrl} />
+        <PdfViewerWrapper pdfUrl={pdfUrl} />
 
         <Snackbar
             anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
