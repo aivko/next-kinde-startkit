@@ -116,6 +116,7 @@ export function ClientForm({ customer= {}, isModalOpen = false, customers = [], 
       setValue('fibra_transfer', customer.fibra_transfer);
       setValue('postalBulletin', customer.postalBulletin);
       setValue('fiberMobileNumber', customer.fiberMobileNumber);
+      setValue('offerAccepted', '0');
       setPodStatus(customer.pod_status);
       setPdrStatus(customer.pdr_status);
       setFibraStatus(customer.fibra_status);

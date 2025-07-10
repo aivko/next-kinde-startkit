@@ -13,11 +13,13 @@ import { fetchAllCustomer } from "@/components/dashboard/customer/api";
 import Chip from "@mui/material/Chip";
 import StickyTable from "@/components/dashboard/shared/StickyTable";
 import AgencyCardContent from "@/components/dashboard/agency/agency-card-content";
+import AgencyContractView from "@/components/dashboard/agency/agency-contract-view";
 
 export default function AgencyTable({ agencies, adminInfo }) {
   const [expanded, setExpanded] = React.useState<string | false>(false);
   const [customers, setCustomers] = React.useState<[]>([]);
   const [isLoading, setLoading] = React.useState<boolean | false>(false);
+  const [openDialog, setOpenDialog] = React.useState<boolean | false>(false);
 
   const handleChange = (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
     setCustomers([]);
@@ -92,6 +94,10 @@ export default function AgencyTable({ agencies, adminInfo }) {
             }
           </Accordion>
         ))
+      }
+
+      {
+        openDialog && <AgencyContractView />
       }
     </>
   );

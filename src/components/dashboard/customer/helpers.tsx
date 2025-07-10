@@ -45,6 +45,7 @@ export interface FormData {
   pdr_transfer: string;
   postalBulletin: boolean;
   fiberMobileNumber: string;
+  offerAccepted: string;
 }
 
 export const validationSchema = Yup.object().shape({

@@ -49,6 +49,7 @@ interface CustomerProfileData {
   files: object,
   postalBulletin: boolean,
   fiberMobileNumber: string,
+  offerAccepted: string,
 }
 
 async function createCustomerDb(payload: CustomerProfileData) {

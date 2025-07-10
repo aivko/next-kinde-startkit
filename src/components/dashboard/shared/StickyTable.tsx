@@ -20,24 +20,30 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import Dialog from "@mui/material/Dialog";
 import { ClientForm } from "@/components/dashboard/shared/ClientForm";
 import { removeCustomer } from "@/components/dashboard/customer/api";
+import DescriptionIcon from "@mui/icons-material/Description";
+import Tooltip from '@mui/material/Tooltip';
+import AgencyContractView from "@/components/dashboard/agency/agency-contract-view";
 
 interface Column {
-  id: 'name' | 'email' | 'luce' | 'gas' | 'action' | 'fibra';
+  id: 'name' | 'email' | 'luce' | 'gas' | 'action' | 'fibra' | 'offerta';
   label: string;
   minWidth?: number;
+  title: string | JSX.Element;
 }
 
 const columns: readonly Column[] = [
-  { id: 'name', label: 'Cliente' },
-  { id: 'email', label: 'Email' },
-  { id: 'luce', label: 'Stato Luce' },
-  { id: 'gas', label: 'Stato Gas' },
-  { id: 'fibra', label: 'Stato Fibra' },
-  { id: 'action', label: 'Azioni' },
+  { id: 'name', label: 'Cliente', title: 'Nome del cliente' },
+  { id: 'email', label: 'Email', title: 'Email del cliente' },
+  { id: 'luce', label: 'Stato Luce', title: 'Stato del contratto luce' },
+  { id: 'gas', label: 'Stato Gas', title: 'Stato del contratto gas' },
+  { id: 'fibra', label: 'Stato Fibra', title: 'Stato del contratto fibra' },
+  { id: 'action', label: 'Azioni', title: 'Azioni disponibili per il cliente' },
+  { id: 'offerta', label: 'Offerta', title: (<>Grey - contract not sending yet. <br />Blue - contract is pending to accept. <br />Green - contract is accepted.</>) },
 ];
 
 export default function StickyTable({ customers, handleEditCustomer, handleDeleteCustomer, agencyData = {} }) {
   const [isDialogOpen, setDialogOpen] = React.useState<boolean>(false);
+  const [openContractView, setOpenContractView] = React.useState<boolean>(false);
   const [isModalOpen, setModalOpen] = React.useState<boolean | false>(false);
   const [agencyClient, setAgencyClient] = React.useState<object>({});
   const [customer, setCustomer] = React.useState<{}>({});
@@ -64,6 +70,23 @@ export default function StickyTable({ customers, handleEditCustomer, handleDelet
     setAgencyClient(client)
   };
 
+  const handleShowContractView = async (customer: any) => {
+    setCustomer(customer);
+    setOpenContractView(true);
+  }
+
+  const handleCloseAgencyView = () => {
+    setOpenContractView(false);
+  };
+
+  const setOfferStatus = (customer:any) => {
+    const status = customer.offerAccepted;
+    return {
+      color: status === '1' ? 'info' : status === '2' ? 'success' : 'inherit',
+      text: status === '1' ? 'pending to accept' : status === '2' ? 'accepted' : 'not sending yet'
+    }
+  };
+
   const handleDeleteClient = async () => {
     try {
       await removeCustomer(agencyClient);
@@ -84,12 +107,11 @@ export default function StickyTable({ customers, handleEditCustomer, handleDelet
           <TableHead>
             <TableRow>
               {columns.map((column) => (
-                <TableCell
-                  key={column.id}
-                  style={{ minWidth: column.minWidth }}
-                >
-                  {column.label}
-                </TableCell>
+                <Tooltip key={column.id} title={column.title}>
+                  <TableCell style={{ minWidth: column.minWidth }}>
+                    {column.label}
+                  </TableCell>
+                </Tooltip>
               ))}
             </TableRow>
           </TableHead>
@@ -107,7 +129,7 @@ export default function StickyTable({ customers, handleEditCustomer, handleDelet
                     {
                       customer?.pod_status && customer?.pod && <Chip
                         size="small"
-                        sx={{ minWidth: '100px' }}
+                        sx={{ minWidth: '80px' }}
                         label={setStatusLabel(customer?.pod_status)}
                         color={setStatusColors(customer?.pod_status)}
                       />
@@ -117,7 +139,7 @@ export default function StickyTable({ customers, handleEditCustomer, handleDelet
                     {
                       customer?.pdr_status && customer?.pdr && <Chip
                         size="small"
-                        sx={{ minWidth: '100px' }}
+                        sx={{ minWidth: '80px' }}
                         label={setStatusLabel(customer?.pdr_status)}
                         color={setStatusColors(customer?.pdr_status)}
                       />
@@ -127,7 +149,7 @@ export default function StickyTable({ customers, handleEditCustomer, handleDelet
                     {
                       customer?.fibra_status && customer?.fibreSelected && <Chip
                         size="small"
-                        sx={{ minWidth: '100px' }}
+                        sx={{ minWidth: '80px' }}
                         label={setStatusLabel(customer?.fibra_status)}
                         color={setStatusColors(customer?.fibra_status)}
                       />
@@ -149,6 +171,17 @@ export default function StickyTable({ customers, handleEditCustomer, handleDelet
                     >
                       <DeleteForeverIcon />
                     </IconButton>
+                  </TableCell>
+                  <TableCell>
+                    <Tooltip title={setOfferStatus(customer).text}>
+                      <IconButton
+                        onClick={() => handleShowContractView(customer)}
+                        aria-label={setOfferStatus(customer).text}
+                        size="small"
+                      >
+                        <DescriptionIcon color={ setOfferStatus(customer).color } />
+                      </IconButton>
+                    </Tooltip>
                   </TableCell>
                 </TableRow>
               );
@@ -209,6 +242,11 @@ export default function StickyTable({ customers, handleEditCustomer, handleDelet
           </Button>
         </DialogActions>
       </Dialog>
+      <AgencyContractView
+        customer={customer}
+        openContractView={openContractView}
+        onAction={handleCloseAgencyView}
+      />
     </>
   );
 }

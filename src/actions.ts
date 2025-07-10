@@ -9,6 +9,7 @@ const RESEND_API_KEY = 're_CYdsezfy_4tE2MXBVtYARgYcBaDhi29CC';
 const EMAIL_SUBJECTS = {
     agency: "Nuova registrazione dell'agenzia",
     client: "Registrazione nuovo cliente",
+    confirmation: "Client approved offer ",
 };
 
 export const sendEmail = async ({ data, type, agency }) => {
