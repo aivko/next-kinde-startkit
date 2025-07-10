@@ -2,6 +2,7 @@ import {redirect} from "next/navigation";
 
 export default function Dashboard() {
     redirect("/dashboard/account")
+
   return (
     <div className="container">
       <section className="next-steps-section">

@@ -8,5 +8,6 @@ export const paths = {
     about: '/dashboard/about',
     information: '/dashboard/information',
   },
+  confirmation: '/confirmation',
   errors: { notFound: '/errors/not-found' },
 } as const;

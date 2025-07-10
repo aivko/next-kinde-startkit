@@ -27,6 +27,7 @@ interface Customer {
   operationProvince:string,
   phoneNumber:string,
   postalBulletin: boolean,
+  offerAccepted: string,
 }
 
 interface ClientContextType {

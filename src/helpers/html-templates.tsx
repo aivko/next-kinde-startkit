@@ -89,10 +89,62 @@ const clientRegisterTemplate = ({ data, agency }) => `
     </div>
   </div>`;
 
+const clientOfferApproveTemplate = ({ data }) => `<div style="max-width: 600px; width: 100%; margin: 20px auto; background: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); border: 1px solid #ddd;">
+  <div style="background: #7700C4; color: white; text-align: center; padding: 15px; font-size: 20px; border-radius: 8px;">
+    ✅ Offer Approved!
+  </div>
+
+  <div style="padding: 20px; font-size: 16px; color: #333;">
+    <p style="color: #555; font-size: 16px; font-weight: 400; line-height: 1.44em; margin: 0;">
+      Customer <strong>${data.firstName}</strong> from <strong>${data.companyName}</strong> has just <strong>approved the offer</strong>!
+    </p>
+
+    <p style="color: #555; font-size: 16px; font-weight: 400; line-height: 1.44em;">
+      You can now proceed with sending the contract.
+    </p>
+
+    <table align="center" style="border-collapse: collapse; border-spacing: 0; margin: 20px auto; max-width: 620px; width: 100%;">
+      <tr>
+        <td style="background-color: #f5f5f5; padding: 10px;">
+          <strong>📞 Phone:</strong> 
+          <a href="tel:${data.phoneNumber}" style="color: #7700C4;">${data.phoneNumber}</a>
+        </td>
+        <td style="background-color: #f5f5f5; padding: 10px;">
+          <strong>📧 Email:</strong> 
+          <a href="mailto:${data.email}" style="color: #7700C4;">${data.email}</a>
+        </td>
+      </tr>
+    </table>
+
+    <div style="color: #555; font-size: 16px; font-weight: 400; line-height: 1.44em; margin-top: 10px;">
+      <p><strong>Selected Services:</strong></p> 
+      <table align="center" style="border-collapse: collapse; margin: auto; max-width: 620px; width: 100%;">
+        <tr>
+          <td style="background-color: #f5f5f5; padding: 10px;">
+            Electricity: ${data.electricitySelected ? '&#9989;' : '&#10060;'}
+          </td>
+          <td style="background-color: #f5f5f5; padding: 10px;">
+            Gas: ${data.gasSelected ? '&#9989;' : '&#10060;'}
+          </td>
+          <td style="background-color: #f5f5f5; padding: 10px;">
+            Fiber: ${data.fibreSelected ? '&#9989;' : '&#10060;'}
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div style="text-align: center; font-size: 14px; color: #777; padding-top: 15px; border-top: 1px solid #ddd;">
+    Go to <strong><a href="${APP_URL}" style="color: #7700C4;">Admin Panel</a></strong> to manage the contract.
+  </div>
+</div>`;
+
 export const htmlTemplates = ({ data, type, agency }) => {
     if (type === 'agency') {
         return agencyRegisterTemplate({ data });
     } else if (type === 'client') {
         return clientRegisterTemplate({ data, agency })
+    } else if (type === 'confirmation') {
+        return clientOfferApproveTemplate({ data })
     }
 };
