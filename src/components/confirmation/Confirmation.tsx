@@ -84,7 +84,7 @@ export default function Confirmation() {
 
 
   const handleContactClick = () => {
-    window.location.href = 'mailto:info@utenzia.it';
+    window.location.href = 'http://utenzia.it/#contatti';
   };
 
   return (
@@ -96,16 +96,16 @@ export default function Confirmation() {
         display: 'flex',
         flexDirection: 'column',
       }}>
-        <Container maxWidth="sm" sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
+        <Container maxWidth="md" sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
           <Box sx={{ width: '100%' }}>
             <Card sx={{ p: 4, borderRadius: 4, textAlign: 'center', boxShadow: 3, backgroundColor: '#fafafa' }}>
               <CardContent>
                 <CheckCircleIcon color="success" sx={{ fontSize: 60, mb: 2 }} />
                 <Typography variant="h5" gutterBottom>
-                  Thank you for accepting our offer!
+                  Grazie per aver accettato la nostra offerta!
                 </Typography>
                 <Typography variant="body1" sx={{ mb: 3 }}>
-                  We've received your confirmation. One of our agents will contact you shortly to finalize the details.
+                  Abbiamo ricevuto la tua conferma. Riceverai presto un messaggio e una email per la firma del contratto e la finalizzazione dei dettagli.
                 </Typography>
                 <Button
                   variant="contained"
@@ -113,7 +113,7 @@ export default function Confirmation() {
                   sx={{ borderRadius: 3, mt: 2 }}
                   onClick={handleContactClick}
                 >
-                  Contact us
+                  Contattaci
                 </Button>
               </CardContent>
             </Card>

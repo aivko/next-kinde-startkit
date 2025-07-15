@@ -38,7 +38,7 @@ const columns: readonly Column[] = [
   { id: 'gas', label: 'Stato Gas', title: 'Stato del contratto gas' },
   { id: 'fibra', label: 'Stato Fibra', title: 'Stato del contratto fibra' },
   { id: 'action', label: 'Azioni', title: 'Azioni disponibili per il cliente' },
-  { id: 'offerta', label: 'Offerta', title: (<>Grey - contract not sending yet. <br />Blue - contract is pending to accept. <br />Green - contract is accepted.</>) },
+  { id: 'offerta', label: 'Offerta', title: (<>Grigio - contratto non ancora inviato. <br />Blu - il contratto è in attesa di accettazione. <br />Verde: il contratto è accettato.</>) },
 ];
 
 export default function StickyTable({ customers, handleEditCustomer, handleDeleteCustomer, agencyData = {} }) {
@@ -83,7 +83,7 @@ export default function StickyTable({ customers, handleEditCustomer, handleDelet
     const status = customer.offerAccepted;
     return {
       color: status === '1' ? 'info' : status === '2' ? 'success' : 'inherit',
-      text: status === '1' ? 'pending to accept' : status === '2' ? 'accepted' : 'not sending yet'
+      text: status === '1' ? 'in attesa di accettazione' : status === '2' ? 'accettato' : 'non ancora inviato'
     }
   };
 

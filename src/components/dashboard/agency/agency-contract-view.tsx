@@ -117,11 +117,11 @@ export default function AgencyContractView({ openContractView, customer, onActio
 
   return (
     <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>Add Customer Information and Upload Contract</DialogTitle>
+      <DialogTitle>Aggiungi informazioni sul cliente e carica il contratto</DialogTitle>
       <DialogContent sx={{ paddingBottom: 0 }}>
         <DialogContentText>
-          Please enter the customer's details and upload the contract files in PDF format.
-          This helps us keep everything organized and ensures your customer receives their contract promptly.
+          Inserisci i dati del cliente e carica i file del contratto in formato PDF.
+          Questo ci aiuta a organizzare tutto e a garantire che il tuo cliente riceva il contratto tempestivamente.
         </DialogContentText>
         <form onSubmit={handleSubmit}>
           <TextField
@@ -130,7 +130,7 @@ export default function AgencyContractView({ openContractView, customer, onActio
             margin="dense"
             id="email"
             name="email"
-            label="Email Address"
+            label="Indirizzo Email"
             type="email"
             fullWidth
             variant="standard"
@@ -141,7 +141,7 @@ export default function AgencyContractView({ openContractView, customer, onActio
             margin="dense"
             id="name"
             name="name"
-            label="Name"
+            label="Nome"
             type="text"
             fullWidth
             variant="standard"
@@ -194,12 +194,12 @@ export default function AgencyContractView({ openContractView, customer, onActio
             <Button
               variant="contained"
               onClick={handleClose}
-            >Cancel</Button>
+            >Cancellare</Button>
             <Button
               variant="contained"
               disabled={ addedFiles.length === 0 || addedFilesError }
               type="submit"
-            >Send</Button>
+            >Invia modulo</Button>
           </DialogActions>
         </form>
       </DialogContent>
