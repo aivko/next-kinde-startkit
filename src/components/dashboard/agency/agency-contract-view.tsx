@@ -79,8 +79,8 @@ export default function AgencyContractView({ openContractView, customer, onActio
     const formData = new FormData(event.currentTarget);
     const formJson = Object.fromEntries((formData as any).entries());
 
-    emailjs.init('TZHCdMcBoY03FTWSJ');
-    await emailjs.send("service_gn2k0kd","template_7ixdql2",{
+    emailjs.init('YHYRXGKoG7B3V701g');
+    await emailjs.send("service_ppxf6ss","template_k5yz4lk",{
       customerName: formJson?.name,
       pdfLink: addedFiles[0]?.url,
       pdfName: addedFiles[0]?.name,
